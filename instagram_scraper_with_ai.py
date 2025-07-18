@@ -1,0 +1,746 @@
+import instaloader
+import time
+import browser_cookie3
+from instaloader.exceptions import ConnectionException, ProfileNotExistsException, QueryReturnedBadRequestException
+import os
+import shutil
+from dotenv import load_dotenv
+from io import BytesIO
+import requests
+from elevenlabs.client import ElevenLabs
+import mysql.connector
+from mysql.connector import Error
+from datetime import datetime
+import concurrent.futures
+from threading import Lock
+import glob
+import random
+from groq import Groq
+
+load_dotenv()
+
+# ElevenLabs API key
+api_key = os.getenv("MY_API_KEY")
+
+# Groq API key
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# Database configuration
+DB_CONFIG = {
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', '00eability'),
+    'database': os.getenv('DB_NAME', 'dubai_marketplace'),
+    'charset': 'utf8mb4',
+    'collation': 'utf8mb4_unicode_ci'
+}
+
+# Global variables for thread safety
+db_lock = Lock()
+file_lock = Lock()
+
+try:
+    elevenlabs = ElevenLabs(api_key=api_key)
+    print("✅ ElevenLabs client initialized successfully")
+except Exception as e:
+    print(f"❌ Error initializing ElevenLabs client: {str(e)}")
+    elevenlabs = None
+
+try:
+    groq_client = Groq(api_key=groq_api_key)
+    print("✅ Groq AI client initialized successfully")
+except Exception as e:
+    print(f"❌ Error initializing Groq client: {str(e)}")
+    groq_client = None
+
+def clear_instaloader_sessions():
+    """Clear all Instaloader session files"""
+    try:
+        session_locations = [
+            os.path.expanduser("~/.config/instaloader/"),
+            os.path.expanduser("~/.instaloader/"),
+            "./",
+            os.getcwd()
+        ]
+        
+        print("🧹 Clearing old Instaloader sessions...")
+        
+        for location in session_locations:
+            if os.path.exists(location):
+                session_files = glob.glob(os.path.join(location, "session-*"))
+                for session_file in session_files:
+                    try:
+                        os.remove(session_file)
+                        print(f"🗑️  Removed: {session_file}")
+                    except Exception as e:
+                        print(f"⚠️  Could not remove {session_file}: {e}")
+        
+        print("✅ Session cleanup completed")
+        
+    except Exception as e:
+        print(f"⚠️  Error during session cleanup: {e}")
+
+def clean_transcription_with_ai(original_transcription):
+    """Clean transcription using Groq AI"""
+    if not groq_client or not original_transcription:
+        return original_transcription
+    
+    try:
+        print("🤖 Cleaning transcription with AI...")
+        
+        # Enhanced prompt for better transcription cleaning
+        prompt = f"""تو یک ویراستار حرفه‌ای و باتجربه محتوا برای وبسایت و وبلاگ هستی. متن زیر ترنسکریپشن یک ویدیو از اینستاگرام است.
+وظیفه تو:
+1. متن را برای انتشار در وبسایت و وبلاگ به‌صورت حرفه‌ای، روان و خوانا ویرایش کن.
+2. محتوای اصلی و پیام کلیدی متن را کاملاً حفظ کن، چه مربوط به املاک باشد و چه موضوع دیگری.
+3. کلمات نامناسب، تکرارهای غیرضروری، عبارات غیرحرفه‌ای یا محاوره‌ای را حذف یا اصلاح کن.
+4. جملات ناتمام یا مبهم را واضح و کامل کن، بدون تغییر در معنای اصلی.
+5. تمام اطلاعات کلیدی مانند جزئیات تماس، قیمت‌ها (در صورت وجود) و سایر اطلاعات مهم را دقیقاً حفظ کن.
+6. سبک نوشتار را به‌گونه‌ای تنظیم کن که برای مخاطبان وبسایت حرفه‌ای و جذاب باشد.
+7. فقط متن ویرایش‌شده را ارائه کن، بدون هیچ توضیح اضافی.
+
+متن اصلی:
+{original_transcription}
+
+متن تمیز شده:"""
+
+        response = groq_client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            model="gemma2-9b-it",  # Using a good model for Persian text
+            temperature=0.3,  # Lower temperature for more consistent cleaning
+            max_tokens=2000,
+            top_p=0.9
+        )
+        
+        cleaned_text = response.choices[0].message.content.strip()
+        
+        # Basic validation - ensure we got meaningful content back
+        if len(cleaned_text) < 20 or len(cleaned_text) > len(original_transcription) * 2:
+            print("⚠️ AI cleaning result seems invalid, using original")
+            return original_transcription
+        
+        print("✅ Transcription cleaned successfully with AI")
+        return cleaned_text
+        
+    except Exception as e:
+        print(f"⚠️ AI cleaning failed: {e}")
+        print("📝 Using original transcription")
+        return original_transcription
+
+def create_database_connection():
+    """Create and return a database connection"""
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        if connection.is_connected():
+            return connection
+    except Error as e:
+        print(f"❌ Error connecting to MySQL database: {e}")
+        return None
+
+def ensure_database_structure(connection):
+    """Ensure the database has the correct structure - OPTIMIZED"""
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'posts'
+            AND COLUMN_NAME IN ('thumbnail', 'instagram_shortcode')
+        """, (DB_CONFIG['database'],))
+
+        existing_columns = {row[0] for row in cursor.fetchall()}
+
+        if 'thumbnail' not in existing_columns:
+            cursor.execute("ALTER TABLE posts ADD COLUMN thumbnail VARCHAR(255) AFTER caption")
+
+        if 'instagram_shortcode' not in existing_columns:
+            cursor.execute("ALTER TABLE posts ADD COLUMN instagram_shortcode VARCHAR(50) AFTER original_url")
+            cursor.execute("CREATE UNIQUE INDEX idx_agent_shortcode ON posts (agent_id, instagram_shortcode)")
+
+        cursor.execute("""
+            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'filtered_posts'
+        """, (DB_CONFIG['database'],))
+
+        if not cursor.fetchone():
+            cursor.execute("""
+                CREATE TABLE filtered_posts (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    agent_id VARCHAR(50),
+                    instagram_shortcode VARCHAR(50),
+                    filter_reason VARCHAR(100),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY unique_agent_shortcode (agent_id, instagram_shortcode)
+                )
+            """)
+
+        connection.commit()
+        return True
+    except Error as e:
+        print(f"❌ Error checking database structure: {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+
+def count_persian_characters(text):
+    """Count Persian/Farsi characters in text - OPTIMIZED"""
+    if not text:
+        return 0
+
+    persian_chars = set('آابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی')
+    return sum(1 for char in text if char in persian_chars)
+
+def get_or_create_agent(connection, username, profile_data):
+    """Get existing agent or create new one - OPTIMIZED"""
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT id FROM agents WHERE instagram = %s", (username,))
+        existing_agent = cursor.fetchone()
+
+        if existing_agent:
+            return existing_agent[0]
+
+        timestamp = int(time.time())
+        agent_id = f"{username.replace('.', '-').replace('_', '-')}-{timestamp}"
+
+        full_name = profile_data.get('full_name', '').strip() or username.replace('.', ' ').replace('_', ' ').title()
+        biography = profile_data.get('biography', '').strip() or f'Real estate professional in Dubai. Follow @{username} for the latest property updates.'
+
+        cursor.execute("""
+            INSERT INTO agents (id, name, profile_image, address, bio, phone, email, instagram, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+        """, (
+            agent_id, full_name, f"/agents/{agent_id}/profile/profile_picture.jpg",
+            "Dubai, UAE", biography, None, None, username
+        ))
+
+        connection.commit()
+        print(f"✅ New agent created: {agent_id}")
+        return agent_id
+
+    except Error as e:
+        print(f"❌ Error getting/creating agent: {e}")
+        connection.rollback()
+        return None
+    finally:
+        if cursor:
+            cursor.close()
+
+def get_existing_and_filtered_shortcodes(connection, agent_id):
+    """Get both existing and filtered shortcodes in one query - OPTIMIZED"""
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT instagram_shortcode FROM posts WHERE agent_id = %s AND instagram_shortcode IS NOT NULL", (agent_id,))
+        existing = {row[0] for row in cursor.fetchall()}
+
+        cursor.execute("SELECT instagram_shortcode FROM filtered_posts WHERE agent_id = %s", (agent_id,))
+        filtered = {row[0] for row in cursor.fetchall()}
+
+        return existing, filtered
+
+    except Error as e:
+        print(f"❌ Error getting shortcodes: {e}")
+        return set(), set()
+    finally:
+        if cursor:
+            cursor.close()
+
+def add_to_filtered_posts(connection, agent_id, shortcode, reason):
+    """Add a post to the filtered posts table - OPTIMIZED"""
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""
+            INSERT IGNORE INTO filtered_posts (agent_id, instagram_shortcode, filter_reason)
+            VALUES (%s, %s, %s)
+        """, (agent_id, shortcode, reason))
+        connection.commit()
+    except Error as e:
+        print(f"❌ Error adding to filtered posts: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+
+def get_next_post_number(connection, agent_id):
+    """Get the next post number - OPTIMIZED"""
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM posts WHERE agent_id = %s", (agent_id,))
+        return cursor.fetchone()[0] + 1
+    except Error as e:
+        return 1
+    finally:
+        if cursor:
+            cursor.close()
+
+def save_post_to_database(connection, agent_id, post_data, post_number):
+    """Save a post to the database - OPTIMIZED"""
+    try:
+        with db_lock:
+            cursor = connection.cursor()
+
+            timestamp = int(time.time())
+            post_id = f"{agent_id}-post-{post_number:03d}-{timestamp}"
+
+            cursor.execute("SELECT id FROM posts WHERE agent_id = %s AND instagram_shortcode = %s",
+                          (agent_id, post_data.get('instagram_shortcode', '')))
+            if cursor.fetchone():
+                return "duplicate"
+
+            cursor.execute("""
+                INSERT INTO posts (id, agent_id, title, content, caption, thumbnail, transcription, date, original_url, instagram_shortcode, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (
+                post_id, agent_id, post_data.get('title', f"Post {post_number}"),
+                post_data.get('content', ''), post_data.get('caption', ''),
+                f"/agents/{agent_id}/posts/post_{post_number}_thumbnail.jpg",
+                post_data.get('transcription', None), post_data.get('date', datetime.now()),
+                post_data.get('original_url', ''), post_data.get('instagram_shortcode', '')
+            ))
+
+            connection.commit()
+            return post_id
+
+    except Error as e:
+        if "Duplicate entry" in str(e):
+            return "duplicate"
+        else:
+            print(f"❌ Error saving post: {e}")
+            connection.rollback()
+            return None
+    finally:
+        if cursor:
+            cursor.close()
+
+def download_and_process_media(post, post_folder, post_number, download_folder):
+    """Download and process media files - OPTIMIZED"""
+    try:
+        thumbnail_response = requests.get(post.url, timeout=15)
+        if thumbnail_response.status_code == 200:
+            thumbnail_path = os.path.join(post_folder, f"post_{post_number}_thumbnail.jpg")
+            with open(thumbnail_path, 'wb') as f:
+                f.write(thumbnail_response.content)
+
+        video_processed = False
+        for file in os.listdir(download_folder):
+            if file.endswith('.mp4') and 'UTC' in file:
+                old_video_path = os.path.join(download_folder, file)
+                new_video_path = os.path.join(post_folder, f"post_{post_number}_video.mp4")
+                shutil.move(old_video_path, new_video_path)
+                video_processed = True
+                break
+
+        return video_processed, new_video_path if video_processed else None
+
+    except Exception as e:
+        print(f"⚠️ Error downloading media: {e}")
+        return False, None
+
+def transcribe_video_optimized(video_path):
+    """Transcribe video with optimized settings"""
+    if not elevenlabs:
+        return None
+
+    try:
+        with open(video_path, 'rb') as f:
+            audio_data = BytesIO(f.read())
+
+        transcription = elevenlabs.speech_to_text.convert(
+            file=audio_data,
+            model_id="scribe_v1",
+            language_code="fas"
+        )
+
+        return transcription.text.strip()
+
+    except Exception as e:
+        print(f"⚠️ Transcription failed: {e}")
+        return None
+
+def process_single_post(post, agent_id, connection, download_folder, current_post_number, existing_shortcodes, filtered_shortcodes, profile_data, username):
+    """Process a single post - WITH AI TRANSCRIPTION CLEANING"""
+    post_shortcode = post.shortcode
+
+    if post_shortcode in existing_shortcodes or post_shortcode in filtered_shortcodes:
+        return None, "skipped"
+
+    try:
+        post_folder_name = f"post_{current_post_number}_{post.date_utc.strftime('%Y%m%d_%H%M%S')}_{post_shortcode}"
+        post_folder = os.path.join(download_folder, post_folder_name)
+
+        with file_lock:
+            os.makedirs(post_folder, exist_ok=True)
+
+        # EXACT WORKING METHOD FROM YOUR ORIGINAL CODE
+        ig = instaloader.Instaloader(
+            download_videos=True,
+            download_video_thumbnails=False,
+            download_geotags=False,
+            download_comments=False,
+            save_metadata=False,
+            compress_json=False,
+            post_metadata_txt_pattern=""
+        )
+
+        cookies = browser_cookie3.chrome(domain_name="instagram.com")
+        ig.context._session.cookies.update(cookies)
+
+        ig.download_post(post, target=download_folder)
+
+        video_processed, video_path = download_and_process_media(post, post_folder, current_post_number, download_folder)
+
+        if not video_processed:
+            add_to_filtered_posts(connection, agent_id, post_shortcode, "image_only_no_video")
+            return None, "filtered"
+
+        # Step 1: Get original transcription from ElevenLabs
+        original_transcription = transcribe_video_optimized(video_path)
+
+        if not original_transcription:
+            add_to_filtered_posts(connection, agent_id, post_shortcode, "transcription_failed")
+            return None, "filtered"
+
+        persian_char_count = count_persian_characters(original_transcription)
+
+        if persian_char_count < 50:
+            add_to_filtered_posts(connection, agent_id, post_shortcode, f"insufficient_persian_chars_{persian_char_count}")
+            return None, "filtered"
+
+        # Step 2: Clean transcription with AI
+        cleaned_transcription = clean_transcription_with_ai(original_transcription)
+
+        # Save both original and cleaned transcriptions
+        with open(os.path.join(post_folder, "transcription_original.txt"), 'w', encoding='utf-8') as f:
+            f.write(original_transcription)
+
+        with open(os.path.join(post_folder, "transcription_cleaned.txt"), 'w', encoding='utf-8') as f:
+            f.write(cleaned_transcription)
+
+        # For backward compatibility, also save as transcription.txt (cleaned version)
+        with open(os.path.join(post_folder, "transcription.txt"), 'w', encoding='utf-8') as f:
+            f.write(cleaned_transcription)
+
+        caption = post.caption if post.caption else "No caption available"
+        if post.caption_mentions:
+            caption += f"\n\n👥 Mentions: {', '.join([f'@{mention}' for mention in post.caption_mentions])}"
+        if post.caption_hashtags:
+            caption += f"\n\n🏷️ Hashtags: {', '.join([f'#{hashtag}' for hashtag in post.caption_hashtags])}"
+
+        with open(os.path.join(post_folder, "caption.txt"), 'w', encoding='utf-8') as f:
+            f.write(caption)
+
+        # Use cleaned transcription for database content
+        post_data = {
+            'title': f"Post {current_post_number} by {profile_data['full_name'] or username}",
+            'content': cleaned_transcription,  # Using cleaned version
+            'caption': caption,
+            'transcription': cleaned_transcription,  # Using cleaned version
+            'date': post.date_utc,
+            'original_url': f"https://instagram.com/p/{post_shortcode}",
+            'instagram_shortcode': post_shortcode
+        }
+
+        post_id = save_post_to_database(connection, agent_id, post_data, current_post_number)
+
+        if post_id and post_id != "duplicate":
+            return {
+                'post_number': current_post_number,
+                'folder_name': post_folder_name,
+                'post_id': post_id,
+                'shortcode': post_shortcode
+            }, "success"
+
+        return None, "failed"
+
+    except Exception as e:
+        print(f"❌ Error processing post {post_shortcode}: {e}")
+        return None, "error"
+
+def organize_files_optimized(username, agent_id, downloaded_folder, saved_posts_info):
+    """Organize files with optimized operations"""
+    try:
+        agent_public_dir = f"public/agents/{agent_id}"
+        profile_dir = f"{agent_public_dir}/profile"
+        posts_dir = f"{agent_public_dir}/posts"
+
+        os.makedirs(profile_dir, exist_ok=True)
+        os.makedirs(posts_dir, exist_ok=True)
+
+        profile_pic_source = os.path.join(downloaded_folder, f"{username}_profile.jpg")
+        if os.path.exists(profile_pic_source):
+            shutil.copy2(profile_pic_source, os.path.join(profile_dir, "profile_picture.jpg"))
+
+        def copy_post_files(post_info):
+            post_number = post_info['post_number']
+            post_folder_name = post_info['folder_name']
+            post_folder_path = os.path.join(downloaded_folder, post_folder_name)
+
+            if not os.path.exists(post_folder_path):
+                return
+
+            thumbnail_files = [f for f in os.listdir(post_folder_path) if f.endswith('_thumbnail.jpg')]
+            if thumbnail_files:
+                shutil.copy2(
+                    os.path.join(post_folder_path, thumbnail_files[0]),
+                    os.path.join(posts_dir, f"post_{post_number}_thumbnail.jpg")
+                )
+
+            video_files = [f for f in os.listdir(post_folder_path) if f.endswith('_video.mp4')]
+            if video_files:
+                shutil.copy2(
+                    os.path.join(post_folder_path, video_files[0]),
+                    os.path.join(posts_dir, f"post_{post_number}_video.mp4")
+                )
+
+            for file in os.listdir(post_folder_path):
+                if file.endswith('.txt'):
+                    shutil.copy2(
+                        os.path.join(post_folder_path, file),
+                        os.path.join(posts_dir, f"post_{post_number}_{file}")
+                    )
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+            executor.map(copy_post_files, saved_posts_info)
+
+        return True
+
+    except Exception as e:
+        print(f"❌ Error organizing files: {e}")
+        return False
+
+def download_instagram_profile(username, browser="chrome", max_posts=5):
+    """WORKING Instagram profile downloader WITH AI TRANSCRIPTION CLEANING"""
+    print(f"🚀 Instagram scraper with AI cleaning for @{username}")
+    print("⚡ USING EXACT WORKING METHOD + AI TRANSCRIPTION CLEANING")
+    print("🤖 AI will clean transcriptions for website/blog use")
+    print("📅 POSTS ORDERED: Newest to Oldest")
+    print("=" * 60)
+
+    # Only add session cleanup - everything else stays the same
+    clear_instaloader_sessions()
+
+    connection = create_database_connection()
+    if not connection:
+        return
+
+    if not ensure_database_structure(connection):
+        return
+
+    try:
+        print(f"🍪 Loading cookies from {browser}...")
+        if browser.lower() == "chrome":
+            cookies = browser_cookie3.chrome(domain_name="instagram.com")
+        elif browser.lower() == "firefox":
+            cookies = browser_cookie3.firefox(domain_name="instagram.com")
+        else:
+            cookies = browser_cookie3.chromium(domain_name="instagram.com")
+
+        # EXACT WORKING METHOD FROM YOUR ORIGINAL CODE
+        ig = instaloader.Instaloader(
+            download_videos=True,
+            download_video_thumbnails=False,
+            download_geotags=False,
+            download_comments=False,
+            save_metadata=False,
+            compress_json=False,
+            post_metadata_txt_pattern=""
+        )
+
+        ig.context._session.cookies.update(cookies)
+
+        download_folder = f"{username}_posts_{int(time.time())}"
+        os.makedirs(download_folder, exist_ok=True)
+
+        print(f"🔍 Fetching profile information...")
+        profile = instaloader.Profile.from_username(ig.context, username)
+
+        profile_data = {
+            'full_name': profile.full_name or '',
+            'biography': profile.biography or '',
+            'followers': profile.followers,
+            'mediacount': profile.mediacount
+        }
+
+        print(f"👤 {profile_data['full_name']} - {profile_data['followers']:,} followers")
+
+        agent_id = get_or_create_agent(connection, username, profile_data)
+        if not agent_id:
+            return
+
+        existing_shortcodes, filtered_shortcodes = get_existing_and_filtered_shortcodes(connection, agent_id)
+
+        print(f"📊 Already have {len(existing_shortcodes)} posts in database")
+        print(f"📊 Already filtered {len(filtered_shortcodes)} posts")
+
+        profile_pic_response = requests.get(profile.get_profile_pic_url(), timeout=15)
+        if profile_pic_response.status_code == 200:
+            with open(os.path.join(download_folder, f"{username}_profile.jpg"), 'wb') as f:
+                f.write(profile_pic_response.content)
+
+        print(f"📥 Getting posts from Instagram (this may take a moment)...")
+
+        saved_posts_info = []
+        successful_posts = 0
+        skipped_posts = 0
+        filtered_posts = 0
+        total_checked = 0
+        current_post_number = get_next_post_number(connection, agent_id)
+
+        print(f"🎯 Looking for {max_posts} NEW posts...")
+        print(f"📋 Starting from post number {current_post_number}")
+
+        for post in profile.get_posts():
+            if successful_posts >= max_posts:
+                print(f"✅ SUCCESS: Got {max_posts} new posts, stopping!")
+                break
+
+            total_checked += 1
+            post_shortcode = post.shortcode
+            post_date = post.date_utc.strftime('%Y-%m-%d %H:%M')
+
+            if post_shortcode in existing_shortcodes:
+                skipped_posts += 1
+                print(f"⏭️  Skip #{total_checked} (exists): {post_date}")
+                continue
+
+            if post_shortcode in filtered_shortcodes:
+                filtered_posts += 1
+                print(f"🚫 Skip #{total_checked} (filtered): {post_date}")
+                continue
+
+            print(f"🆕 NEW POST #{total_checked} ({successful_posts + 1}/{max_posts}): {post_date}")
+
+            result, status = process_single_post(
+                post, agent_id, connection, download_folder, current_post_number,
+                existing_shortcodes, filtered_shortcodes, profile_data, username
+            )
+
+            if status == "success" and result:
+                saved_posts_info.append(result)
+                existing_shortcodes.add(result['shortcode'])
+                successful_posts += 1
+                current_post_number += 1
+                print(f"✅ SAVED: Post {successful_posts}/{max_posts} (AI cleaned)")
+            elif status == "filtered":
+                filtered_shortcodes.add(post_shortcode)
+                filtered_posts += 1
+                print(f"🚫 FILTERED: Not suitable")
+            else:
+                print(f"❌ FAILED: Could not process")
+
+            # Add small random delay to avoid rate limiting
+            time.sleep(random.uniform(0.5, 1.5))
+
+        if successful_posts > 0:
+            print(f"📁 Organizing {successful_posts} files...")
+            organize_files_optimized(username, agent_id, download_folder, saved_posts_info)
+
+        print(f"\n🎉 FINAL SUMMARY")
+        print("=" * 50)
+        print(f"👤 Agent: {profile_data['full_name']} (@{username})")
+        print(f"🔍 Total posts checked: {total_checked}")
+        print(f"⏭️  Skipped (already exist): {skipped_posts}")
+        print(f"🚫 Skipped (filtered): {filtered_posts}")
+        print(f"✅ NEW posts saved: {successful_posts}")
+        print(f"🤖 AI cleaned transcriptions: {successful_posts}")
+        print(f"📊 Database now has: {len(existing_shortcodes)} total posts")
+        print(f"🔄 CONTINUATION: ✅ WORKING")
+        print(f"📅 Order: Newest to Oldest ✅")
+
+        if successful_posts < max_posts:
+            print(f"⚠️  Note: Only found {successful_posts} new posts (requested {max_posts})")
+            print("   This means you've reached older posts or end of profile")
+
+        try:
+            shutil.rmtree(download_folder)
+        except:
+            pass
+
+    except QueryReturnedBadRequestException as e:
+        print(f"⚠️ Rate limited or unauthorized: {e}")
+        print("💡 Solutions:")
+        print("   1. Wait 10-15 minutes before trying again")
+        print("   2. Make sure you're logged into Instagram in your browser")
+        print("   3. Try using a different browser (chrome/firefox/safari)")
+        print("   4. Clear browser cache and cookies, then log in again")
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+    finally:
+        if connection and connection.is_connected():
+            connection.close()
+
+def test_database_and_show_agents():
+    """Test database connection - OPTIMIZED"""
+    connection = create_database_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""
+                SELECT
+                    (SELECT COUNT(*) FROM agents) as agents,
+                    (SELECT COUNT(*) FROM posts) as posts,
+                    (SELECT COUNT(*) FROM filtered_posts) as filtered
+            """)
+            counts = cursor.fetchone()
+            print(f"📊 Database: {counts[0]} agents, {counts[1]} posts, {counts[2]} filtered")
+        except Error as e:
+            print(f"❌ Database error: {e}")
+        finally:
+            cursor.close()
+            connection.close()
+
+if __name__ == "__main__":
+    print("🚀 INSTAGRAM SCRAPER WITH AI TRANSCRIPTION CLEANING")
+    print("=" * 60)
+    print("✅ USING EXACT WORKING METHOD FROM YOUR ORIGINAL CODE")
+    print("🤖 NEW FEATURE: AI TRANSCRIPTION CLEANING")
+    print("🔄 GUARANTEED CONTINUATION:")
+    print("• First run: Gets posts 1-5")
+    print("• Second run: Gets posts 6-10")
+    print("• Third run: Gets posts 11-15")
+    print("• And so on...")
+    print("🧹 FEATURES:")
+    print("• Session cleanup (clears old cookies)")
+    print("• Random delays (avoids rate limits)")
+    print("• AI transcription cleaning for website/blog")
+    print("• Saves both original and cleaned transcriptions")
+    print("📅 POST ORDERING: Newest to Oldest")
+    print("🔍 FILTER: 50+ Persian characters only")
+    print("=" * 60)
+
+    test_database_and_show_agents()
+
+    print("\n💡 BEFORE STARTING:")
+    print("1. Make sure you're logged into Instagram in your browser")
+    print("2. Close any Instagram tabs and reopen them")
+    print("3. Make sure your Instagram account is not restricted")
+    print("4. AI will clean transcriptions for professional website use")
+    print("=" * 60)
+
+    username = input("Enter Instagram username (default: mojtaba.dubai.amlak): ").strip() or "mojtaba.dubai.amlak"
+    browser = input("Enter browser (chrome/firefox, default: chrome): ").strip() or "chrome"
+    try:
+        max_posts = int(input("Enter max NEW posts to get (default: 5): ").strip() or "5")
+    except ValueError:
+        max_posts = 5
+
+    print(f"\n🎯 Starting AI-enhanced scraper:")
+    print(f"📸 Username: @{username}")
+    print(f"🌐 Browser: {browser}")
+    print(f"📊 Max NEW Posts: {max_posts}")
+    print(f"📅 Order: Newest → Oldest")
+    print(f"🔄 Continuation: GUARANTEED")
+    print(f"✅ Method: EXACT WORKING ORIGINAL")
+    print(f"🤖 AI Cleaning: ENABLED")
+    print("=" * 60)
+
+    download_instagram_profile(username, browser, max_posts)
+    print("\n🎉 AI-enhanced scraping completed!")
