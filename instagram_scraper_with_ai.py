@@ -83,25 +83,25 @@ def clear_instaloader_sessions():
 def generate_persian_title_with_ai(content, caption="", agent_name=""):
     """Generate Persian title using Groq AI"""
     if not groq_client or not content:
+        print("⚠️ No Groq client or content available for title generation")
         return None
     
     try:
         print("🤖 Generating Persian title with AI...")
+        print(f"📝 Content preview: {content[:100]}...")
         
         # Enhanced prompt for better title generation
-        prompt = f"""تو یک متخصص تولید عنوان برای آگهی‌های املاک در دبی هستی. 
+        prompt = f"""تو یک متخصص تولید عنوان برای آگهی‌های املاک در دبی هستی که باید عنوان‌های جذاب و منحصر به فرد بسازی.
 
 وظیفه تو:
-1. بر اساس محتوای ارائه شده، یک عنوان جذاب و حرفه‌ای به زبان فارسی بنویس
-2. عنوان باید بین 5 تا 12 کلمه باشد
-3. عنوان باید شامل نوع ملک (آپارتمان، ویلا، دفتر و...) و منطقه باشد
-4. از کلمات جذاب مثل "لوکس"، "منحصر به فرد"، "ویژه"، "استثنایی" استفاده کن
-5. عنوان باید برای بازاریابی املاک مناسب باشد
-6. فقط عنوان را بنویس، هیچ توضیح اضافی نده
-
-مشاور املاک: {agent_name if agent_name else "مشاور املاک دبی"}
-
-محتوای املاک:
+1. بر اساس محتوای ارائه شده، یک عنوان جذاب، منحصر به فرد و حرفه‌ای به زبان فارسی بنویس
+2. عنوان باید بین 6 تا 15 کلمه باشد
+3. عنوان باید شامل نوع ملک (آپارتمان، ویلا، دفتر، پنت‌هاوس و...) و منطقه دبی باشد
+4. از کلمات جذاب مثل "لوکس"، "منحصر به فرد"، "ویژه"، "استثنایی"، "برتر"، "فوق‌العاده" استفاده کن
+5. عنوان باید برای بازاریابی املاک و SEO مناسب باشد
+6. عنوان باید منعکس‌کننده محتوای واقعی پست باشد
+7. فقط عنوان را بنویس، هیچ توضیح، علامت نقل قول یا متن اضافی نده
+8. عنوان باید کاملاً منحصر به فرد و مرتبط با محتوا باشد
 {content[:500]}
 
 کپشن اصلی:
@@ -116,20 +116,30 @@ def generate_persian_title_with_ai(content, caption="", agent_name=""):
                     "content": prompt
                 }
             ],
-            model="gemma2-9b-it",
+            model="llama-3.1-70b-versatile",  # Using a more powerful model
             temperature=0.7,
-            max_tokens=100,
+            max_tokens=150,
             top_p=0.9
         )
         
         title = response.choices[0].message.content.strip()
         
         # Clean up the title
-        title = title.replace('"', '').replace("'", '').strip()
+        title = title.replace('"', '').replace("'", '').replace('«', '').replace('»', '').strip()
+        
+        # Remove any prefixes like "عنوان:" or "Title:"
+        if ':' in title:
+            title = title.split(':', 1)[-1].strip()
         
         # Validate title length
-        if len(title.split()) < 3 or len(title.split()) > 15:
+        if len(title.split()) < 4 or len(title.split()) > 20:
             print("⚠️ AI title seems invalid, using fallback")
+            return None
+        
+        # Check if title is meaningful (not just generic)
+        generic_words = ['املاک', 'ویژه', 'شماره', 'پست', 'محتوا']
+        if all(word in title for word in generic_words[:3]):
+            print("⚠️ AI title seems too generic, regenerating...")
             return None
         
         print(f"✅ Persian title generated: {title}")
@@ -137,6 +147,7 @@ def generate_persian_title_with_ai(content, caption="", agent_name=""):
         
     except Exception as e:
         print(f"⚠️ AI title generation failed: {e}")
+        print(f"🔍 Error details: {str(e)}")
         return None
 
 def clean_transcription_with_ai(original_transcription):
@@ -354,15 +365,31 @@ def save_post_to_database(connection, agent_id, post_data, post_number):
             if cursor.fetchone():
                 return "duplicate"
 
-            # Generate AI title if not provided
+            # Always generate AI title based on content
             title = post_data.get('title', '')
-            if not title:
+            if not title:  # Only generate if no title provided
+                print(f"🤖 Generating AI title for post {post_number}...")
                 ai_title = generate_persian_title_with_ai(
                     post_data.get('content', ''),
                     post_data.get('caption', ''),
                     post_data.get('agent_name', '')
                 )
-                title = ai_title or f"املاک ویژه شماره {post_number}"
+                
+                if ai_title:
+                    title = ai_title
+                    print(f"✅ AI title generated: {title}")
+                else:
+                    # More descriptive fallback based on content
+                    content_preview = post_data.get('content', '')[:100]
+                    if 'آپارتمان' in content_preview:
+                        title = f"آپارتمان منحصر به فرد در دبی - پست {post_number}"
+                    elif 'ویلا' in content_preview:
+                        title = f"ویلای لوکس در دبی - پست {post_number}"
+                    elif 'دفتر' in content_preview:
+                        title = f"دفتر تجاری مدرن در دبی - پست {post_number}"
+                    else:
+                        title = f"املاک استثنایی در دبی - پست {post_number}"
+                    print(f"⚠️ Using enhanced fallback title: {title}")
 
             cursor.execute("""
                 INSERT INTO posts (id, agent_id, title, content, caption, thumbnail, transcription, date, original_url, instagram_shortcode, created_at)
@@ -376,7 +403,7 @@ def save_post_to_database(connection, agent_id, post_data, post_number):
             ))
 
             connection.commit()
-            print(f"✅ Post saved with AI-generated title: {title}")
+            print(f"✅ Post saved with title: {title}")
             return post_id
 
     except Error as e:
@@ -507,8 +534,21 @@ def process_single_post(post, agent_id, connection, download_folder, current_pos
         with open(os.path.join(post_folder, "caption.txt"), 'w', encoding='utf-8') as f:
             f.write(caption)
 
+        # Step 3: Generate AI title based on cleaned content
+        print(f"🤖 Generating unique AI title for post {current_post_number}...")
+        ai_title = generate_persian_title_with_ai(
+            cleaned_transcription,
+            caption,
+            profile_data['full_name'] or username
+        )
+        
+        if ai_title:
+            print(f"✅ Generated unique title: {ai_title}")
+        else:
+            print(f"⚠️ AI title generation failed, will use enhanced fallback")
         # Use cleaned transcription for database content
         post_data = {
+            'title': ai_title,  # Pass the AI-generated title
             'content': cleaned_transcription,  # Using cleaned version
             'caption': caption,
             'transcription': cleaned_transcription,  # Using cleaned version
@@ -774,7 +814,7 @@ if __name__ == "__main__":
     print("✅ USING EXACT WORKING METHOD FROM YOUR ORIGINAL CODE")
     print("🤖 NEW FEATURES:")
     print("• AI TRANSCRIPTION CLEANING")
-    print("• AI PERSIAN TITLE GENERATION")
+    print("• AI PERSIAN TITLE GENERATION (UNIQUE & CONTENT-BASED)")
     print("🔄 GUARANTEED CONTINUATION:")
     print("• First run: Gets posts 1-5")
     print("• Second run: Gets posts 6-10")
@@ -784,10 +824,11 @@ if __name__ == "__main__":
     print("• Session cleanup (clears old cookies)")
     print("• Random delays (avoids rate limits)")
     print("• AI transcription cleaning for website/blog")
-    print("• AI Persian title generation for each post")
+    print("• AI Persian title generation (unique, content-based)")
     print("• Saves both original and cleaned transcriptions")
     print("📅 POST ORDERING: Newest to Oldest")
     print("🔍 FILTER: 50+ Persian characters only")
+    print("🏷️ TITLE GENERATION: AI creates unique titles based on actual content")
     print("=" * 60)
 
     test_database_and_show_agents()
@@ -796,7 +837,8 @@ if __name__ == "__main__":
     print("1. Make sure you're logged into Instagram in your browser")
     print("2. Close any Instagram tabs and reopen them")
     print("3. Make sure your Instagram account is not restricted")
-    print("4. AI will clean transcriptions and generate Persian titles for professional website use")
+    print("4. AI will clean transcriptions and generate UNIQUE Persian titles based on content")
+    print("5. Make sure GROQ_API_KEY is set in your .env file for title generation")
     print("=" * 60)
 
     username = input("Enter Instagram username (default: mojtaba.dubai.amlak): ").strip() or "mojtaba.dubai.amlak"
@@ -814,8 +856,9 @@ if __name__ == "__main__":
     print(f"🔄 Continuation: GUARANTEED")
     print(f"✅ Method: EXACT WORKING ORIGINAL")
     print(f"🤖 AI Cleaning: ENABLED")
-    print(f"🏷️ Persian Title Generation: ENABLED")
+    print(f"🏷️ Unique Persian Title Generation: ENABLED")
+    print(f"🔑 Groq API: {'✅ ENABLED' if groq_client else '❌ DISABLED (check GROQ_API_KEY)'}")
     print("=" * 60)
 
     download_instagram_profile(username, browser, max_posts)
-    print("\n🎉 AI-enhanced scraping with Persian title generation completed!")
+    print("\n🎉 AI-enhanced scraping with unique Persian title generation completed!")
