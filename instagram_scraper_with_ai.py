@@ -47,7 +47,7 @@ except Exception as e:
     elevenlabs = None
 
 try:
-    groq_client = Groq(api_key=groq_api_key)
+    groq_client = Groq(api_key=GROQ_API_KEY)
     print("✅ Groq AI client initialized successfully")
 except Exception as e:
     print(f"❌ Error initializing Groq client: {str(e)}")
@@ -79,6 +79,65 @@ def clear_instaloader_sessions():
         
     except Exception as e:
         print(f"⚠️  Error during session cleanup: {e}")
+
+def generate_persian_title_with_ai(content, caption="", agent_name=""):
+    """Generate Persian title using Groq AI"""
+    if not groq_client or not content:
+        return None
+    
+    try:
+        print("🤖 Generating Persian title with AI...")
+        
+        # Enhanced prompt for better title generation
+        prompt = f"""تو یک متخصص تولید عنوان برای آگهی‌های املاک در دبی هستی. 
+
+وظیفه تو:
+1. بر اساس محتوای ارائه شده، یک عنوان جذاب و حرفه‌ای به زبان فارسی بنویس
+2. عنوان باید بین 5 تا 12 کلمه باشد
+3. عنوان باید شامل نوع ملک (آپارتمان، ویلا، دفتر و...) و منطقه باشد
+4. از کلمات جذاب مثل "لوکس"، "منحصر به فرد"، "ویژه"، "استثنایی" استفاده کن
+5. عنوان باید برای بازاریابی املاک مناسب باشد
+6. فقط عنوان را بنویس، هیچ توضیح اضافی نده
+
+مشاور املاک: {agent_name if agent_name else "مشاور املاک دبی"}
+
+محتوای املاک:
+{content[:500]}
+
+کپشن اصلی:
+{caption[:200] if caption else "بدون کپشن"}
+
+عنوان فارسی:"""
+
+        response = groq_client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            model="gemma2-9b-it",
+            temperature=0.7,
+            max_tokens=100,
+            top_p=0.9
+        )
+        
+        title = response.choices[0].message.content.strip()
+        
+        # Clean up the title
+        title = title.replace('"', '').replace("'", '').strip()
+        
+        # Validate title length
+        if len(title.split()) < 3 or len(title.split()) > 15:
+            print("⚠️ AI title seems invalid, using fallback")
+            return None
+        
+        print(f"✅ Persian title generated: {title}")
+        return title
+        
+    except Exception as e:
+        print(f"⚠️ AI title generation failed: {e}")
+        return None
 
 def clean_transcription_with_ai(original_transcription):
     """Clean transcription using Groq AI"""
@@ -212,14 +271,14 @@ def get_or_create_agent(connection, username, profile_data):
         agent_id = f"{username.replace('.', '-').replace('_', '-')}-{timestamp}"
 
         full_name = profile_data.get('full_name', '').strip() or username.replace('.', ' ').replace('_', ' ').title()
-        biography = profile_data.get('biography', '').strip() or f'Real estate professional in Dubai. Follow @{username} for the latest property updates.'
+        biography = profile_data.get('biography', '').strip() or f'مشاور املاک حرفه‌ای در دبی. برای آخرین به‌روزرسانی‌های املاک @{username} را دنبال کنید.'
 
         cursor.execute("""
             INSERT INTO agents (id, name, profile_image, address, bio, phone, email, instagram, created_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
         """, (
             agent_id, full_name, f"/agents/{agent_id}/profile/profile_picture.jpg",
-            "Dubai, UAE", biography, None, None, username
+            "دبی، امارات متحده عربی", biography, None, None, username
         ))
 
         connection.commit()
@@ -282,7 +341,7 @@ def get_next_post_number(connection, agent_id):
             cursor.close()
 
 def save_post_to_database(connection, agent_id, post_data, post_number):
-    """Save a post to the database - OPTIMIZED"""
+    """Save a post to the database with AI-generated title - OPTIMIZED"""
     try:
         with db_lock:
             cursor = connection.cursor()
@@ -295,11 +354,21 @@ def save_post_to_database(connection, agent_id, post_data, post_number):
             if cursor.fetchone():
                 return "duplicate"
 
+            # Generate AI title if not provided
+            title = post_data.get('title', '')
+            if not title:
+                ai_title = generate_persian_title_with_ai(
+                    post_data.get('content', ''),
+                    post_data.get('caption', ''),
+                    post_data.get('agent_name', '')
+                )
+                title = ai_title or f"املاک ویژه شماره {post_number}"
+
             cursor.execute("""
                 INSERT INTO posts (id, agent_id, title, content, caption, thumbnail, transcription, date, original_url, instagram_shortcode, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """, (
-                post_id, agent_id, post_data.get('title', f"Post {post_number}"),
+                post_id, agent_id, title,
                 post_data.get('content', ''), post_data.get('caption', ''),
                 f"/agents/{agent_id}/posts/post_{post_number}_thumbnail.jpg",
                 post_data.get('transcription', None), post_data.get('date', datetime.now()),
@@ -307,6 +376,7 @@ def save_post_to_database(connection, agent_id, post_data, post_number):
             ))
 
             connection.commit()
+            print(f"✅ Post saved with AI-generated title: {title}")
             return post_id
 
     except Error as e:
@@ -366,7 +436,7 @@ def transcribe_video_optimized(video_path):
         return None
 
 def process_single_post(post, agent_id, connection, download_folder, current_post_number, existing_shortcodes, filtered_shortcodes, profile_data, username):
-    """Process a single post - WITH AI TRANSCRIPTION CLEANING"""
+    """Process a single post - WITH AI TRANSCRIPTION CLEANING AND TITLE GENERATION"""
     post_shortcode = post.shortcode
 
     if post_shortcode in existing_shortcodes or post_shortcode in filtered_shortcodes:
@@ -428,24 +498,24 @@ def process_single_post(post, agent_id, connection, download_folder, current_pos
         with open(os.path.join(post_folder, "transcription.txt"), 'w', encoding='utf-8') as f:
             f.write(cleaned_transcription)
 
-        caption = post.caption if post.caption else "No caption available"
+        caption = post.caption if post.caption else "بدون کپشن"
         if post.caption_mentions:
-            caption += f"\n\n👥 Mentions: {', '.join([f'@{mention}' for mention in post.caption_mentions])}"
+            caption += f"\n\n👥 منشن‌ها: {', '.join([f'@{mention}' for mention in post.caption_mentions])}"
         if post.caption_hashtags:
-            caption += f"\n\n🏷️ Hashtags: {', '.join([f'#{hashtag}' for hashtag in post.caption_hashtags])}"
+            caption += f"\n\n🏷️ هشتگ‌ها: {', '.join([f'#{hashtag}' for hashtag in post.caption_hashtags])}"
 
         with open(os.path.join(post_folder, "caption.txt"), 'w', encoding='utf-8') as f:
             f.write(caption)
 
         # Use cleaned transcription for database content
         post_data = {
-            'title': f"Post {current_post_number} by {profile_data['full_name'] or username}",
             'content': cleaned_transcription,  # Using cleaned version
             'caption': caption,
             'transcription': cleaned_transcription,  # Using cleaned version
             'date': post.date_utc,
             'original_url': f"https://instagram.com/p/{post_shortcode}",
-            'instagram_shortcode': post_shortcode
+            'instagram_shortcode': post_shortcode,
+            'agent_name': profile_data['full_name'] or username
         }
 
         post_id = save_post_to_database(connection, agent_id, post_data, current_post_number)
@@ -517,10 +587,10 @@ def organize_files_optimized(username, agent_id, downloaded_folder, saved_posts_
         return False
 
 def download_instagram_profile(username, browser="chrome", max_posts=5):
-    """WORKING Instagram profile downloader WITH AI TRANSCRIPTION CLEANING"""
-    print(f"🚀 Instagram scraper with AI cleaning for @{username}")
-    print("⚡ USING EXACT WORKING METHOD + AI TRANSCRIPTION CLEANING")
-    print("🤖 AI will clean transcriptions for website/blog use")
+    """WORKING Instagram profile downloader WITH AI TRANSCRIPTION CLEANING AND TITLE GENERATION"""
+    print(f"🚀 Instagram scraper with AI cleaning and title generation for @{username}")
+    print("⚡ USING EXACT WORKING METHOD + AI TRANSCRIPTION CLEANING + PERSIAN TITLE GENERATION")
+    print("🤖 AI will clean transcriptions and generate Persian titles for website/blog use")
     print("📅 POSTS ORDERED: Newest to Oldest")
     print("=" * 60)
 
@@ -628,7 +698,7 @@ def download_instagram_profile(username, browser="chrome", max_posts=5):
                 existing_shortcodes.add(result['shortcode'])
                 successful_posts += 1
                 current_post_number += 1
-                print(f"✅ SAVED: Post {successful_posts}/{max_posts} (AI cleaned)")
+                print(f"✅ SAVED: Post {successful_posts}/{max_posts} (AI cleaned + Persian title)")
             elif status == "filtered":
                 filtered_shortcodes.add(post_shortcode)
                 filtered_posts += 1
@@ -651,6 +721,7 @@ def download_instagram_profile(username, browser="chrome", max_posts=5):
         print(f"🚫 Skipped (filtered): {filtered_posts}")
         print(f"✅ NEW posts saved: {successful_posts}")
         print(f"🤖 AI cleaned transcriptions: {successful_posts}")
+        print(f"🏷️ AI generated Persian titles: {successful_posts}")
         print(f"📊 Database now has: {len(existing_shortcodes)} total posts")
         print(f"🔄 CONTINUATION: ✅ WORKING")
         print(f"📅 Order: Newest to Oldest ✅")
@@ -698,10 +769,12 @@ def test_database_and_show_agents():
             connection.close()
 
 if __name__ == "__main__":
-    print("🚀 INSTAGRAM SCRAPER WITH AI TRANSCRIPTION CLEANING")
+    print("🚀 INSTAGRAM SCRAPER WITH AI TRANSCRIPTION CLEANING AND PERSIAN TITLE GENERATION")
     print("=" * 60)
     print("✅ USING EXACT WORKING METHOD FROM YOUR ORIGINAL CODE")
-    print("🤖 NEW FEATURE: AI TRANSCRIPTION CLEANING")
+    print("🤖 NEW FEATURES:")
+    print("• AI TRANSCRIPTION CLEANING")
+    print("• AI PERSIAN TITLE GENERATION")
     print("🔄 GUARANTEED CONTINUATION:")
     print("• First run: Gets posts 1-5")
     print("• Second run: Gets posts 6-10")
@@ -711,6 +784,7 @@ if __name__ == "__main__":
     print("• Session cleanup (clears old cookies)")
     print("• Random delays (avoids rate limits)")
     print("• AI transcription cleaning for website/blog")
+    print("• AI Persian title generation for each post")
     print("• Saves both original and cleaned transcriptions")
     print("📅 POST ORDERING: Newest to Oldest")
     print("🔍 FILTER: 50+ Persian characters only")
@@ -722,7 +796,7 @@ if __name__ == "__main__":
     print("1. Make sure you're logged into Instagram in your browser")
     print("2. Close any Instagram tabs and reopen them")
     print("3. Make sure your Instagram account is not restricted")
-    print("4. AI will clean transcriptions for professional website use")
+    print("4. AI will clean transcriptions and generate Persian titles for professional website use")
     print("=" * 60)
 
     username = input("Enter Instagram username (default: mojtaba.dubai.amlak): ").strip() or "mojtaba.dubai.amlak"
@@ -740,7 +814,8 @@ if __name__ == "__main__":
     print(f"🔄 Continuation: GUARANTEED")
     print(f"✅ Method: EXACT WORKING ORIGINAL")
     print(f"🤖 AI Cleaning: ENABLED")
+    print(f"🏷️ Persian Title Generation: ENABLED")
     print("=" * 60)
 
     download_instagram_profile(username, browser, max_posts)
-    print("\n🎉 AI-enhanced scraping completed!")
+    print("\n🎉 AI-enhanced scraping with Persian title generation completed!")
