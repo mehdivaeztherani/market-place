@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { Instagram, Twitter, Linkedin, Mail, Phone, MoreHorizontal, MapPin, Calendar, Star, Users, Camera, ArrowRight } from "lucide-react"
+import { Instagram, Twitter, Linkedin, Mail, Phone, MoreHorizontal, MapPin, Calendar, Star, Users, Camera, ArrowRight, Sparkles, TrendingUp, Award } from "lucide-react"
 import ClientOnly from "@/components/ClientOnly"
 import ImageWithFallback from "@/components/ImageWithFallback"
 import { getImagePath, containsPersianText, getInitials } from "@/lib/utils/imageUtils"
@@ -110,18 +110,26 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 relative overflow-hidden" dir="rtl">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 pattern-dots opacity-30"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-200/20 to-orange-200/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-indigo-200/20 rounded-full blur-3xl"></div>
+
       {/* Premium Header */}
-      <header className="bg-white/95 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
+      <header className="glass-effect sticky top-0 z-50 shadow-lg border-b border-white/20">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Premium Logo */}
             <div className="flex items-center space-x-4 space-x-reverse">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">د</span>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-xl animate-float">
+                  <span className="text-white font-bold text-2xl">د</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold gradient-text">
                   دبی الیت
                 </h1>
                 <p className="text-sm text-amber-600 font-medium">املاک لوکس</p>
@@ -132,19 +140,20 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
             <nav className="flex items-center space-x-6 space-x-reverse">
               <Link 
                 href="/" 
-                className="text-gray-700 hover:text-amber-600 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-amber-50"
+                className="text-gray-700 hover:text-amber-600 transition-all duration-300 font-medium px-4 py-2 rounded-xl hover:bg-amber-50 relative group"
               >
-                خانه
+                <span className="relative z-10">خانه</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
               </Link>
               <Link 
                 href="#properties" 
-                className="text-gray-700 hover:text-amber-600 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-amber-50"
+                className="text-gray-700 hover:text-amber-600 transition-all duration-300 font-medium px-4 py-2 rounded-xl hover:bg-amber-50"
               >
                 املاک
               </Link>
               <Link 
                 href="#contact" 
-                className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-200 font-bold shadow-lg"
+                className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-3 rounded-2xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 font-bold shadow-xl btn-glow transform hover:scale-105"
               >
                 تماس
               </Link>
@@ -153,18 +162,18 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         {/* Hero Profile Section */}
-        <div className="bg-gradient-to-br from-white via-gray-50 to-amber-50/50 rounded-3xl p-12 shadow-2xl border border-gray-100 mb-16 relative overflow-hidden">
+        <div className="glass-effect rounded-3xl p-12 shadow-2xl border border-white/20 mb-16 relative overflow-hidden animate-fade-in-up">
           {/* Decorative Background Elements */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-bl from-amber-200/30 to-orange-200/30 rounded-full -translate-y-32 -translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tr from-blue-200/30 to-indigo-200/30 rounded-full translate-y-24 translate-x-24"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-bl from-amber-200/20 to-orange-200/20 rounded-full -translate-y-32 -translate-x-32 animate-float"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tr from-blue-200/20 to-indigo-200/20 rounded-full translate-y-24 translate-x-24 animate-float" style={{animationDelay: '2s'}}></div>
           
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-8 lg:space-y-0 lg:space-x-12 lg:space-x-reverse">
               {/* Profile Image */}
               <div className="relative">
-                <div className="w-64 h-64 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl">
+                <div className="w-64 h-64 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl animate-bounce-in">
                   {agent.profileImage ? (
                     <ImageWithFallback
                       src={getImagePath(agent.profileImage)}
@@ -178,6 +187,10 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                       {getInitials(agent.name || "مشاور املاک")}
                     </span>
                   )}
+                </div>
+                {/* Online indicator */}
+                <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-green-400 rounded-full border-4 border-white flex items-center justify-center animate-pulse">
+                  <div className="w-6 h-6 bg-green-600 rounded-full"></div>
                 </div>
               </div>
 
@@ -196,6 +209,12 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                       <Camera className="w-5 h-5 text-blue-500" />
                       <span className="font-medium text-lg">{posts.length} املاک</span>
                     </div>
+                    <div className="flex items-center space-x-1 space-x-reverse">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      ))}
+                      <span className="text-sm text-gray-600 mr-2 font-medium">(4.9)</span>
+                    </div>
                   </div>
                 </div>
 
@@ -207,7 +226,7 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                         href={`https://instagram.com/${agent.instagram.replace("@", "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-200 shadow-lg"
+                        className="w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg btn-glow"
                       >
                         <Instagram className="w-7 h-7 text-white" />
                       </a>
@@ -217,7 +236,7 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                         href={`https://twitter.com/${agent.twitter.replace("@", "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-200 shadow-lg"
+                        className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg btn-glow"
                       >
                         <Twitter className="w-7 h-7 text-white" />
                       </a>
@@ -227,7 +246,7 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                         href={`https://linkedin.com/in/${agent.linkedin}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-200 shadow-lg"
+                        className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg btn-glow"
                       >
                         <Linkedin className="w-7 h-7 text-white" />
                       </a>
@@ -265,18 +284,18 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
           {/* Debug Info - Only in development */}
           {process.env.NODE_ENV === 'development' && (
             <ClientOnly>
-              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
+              <div className="mb-8 glass-effect rounded-3xl p-8 border border-blue-200/50">
                 <h3 className="text-lg font-bold text-blue-900 mb-3">وضعیت سیستم</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="bg-white rounded-xl p-4 border border-blue-100">
+                  <div className="bg-white/80 rounded-2xl p-6 border border-blue-100">
                     <p className="font-semibold text-blue-800">شناسه مشاور</p>
                     <p className="text-blue-600">{agent.id}</p>
                   </div>
-                  <div className="bg-white rounded-xl p-4 border border-blue-100">
+                  <div className="bg-white/80 rounded-2xl p-6 border border-blue-100">
                     <p className="font-semibold text-blue-800">پست‌های بارگذاری شده</p>
                     <p className="text-blue-600">{posts.length} املاک</p>
                   </div>
-                  <div className="bg-white rounded-xl p-4 border border-blue-100">
+                  <div className="bg-white/80 rounded-2xl p-6 border border-blue-100">
                     <p className="font-semibold text-blue-800">وضعیت</p>
                     <p className={`font-medium ${loading ? 'text-amber-600' : error ? 'text-red-600' : 'text-green-600'}`}>
                       {loading ? 'در حال بارگذاری...' : error ? 'خطا' : 'آماده'}
@@ -284,7 +303,7 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                   </div>
                 </div>
                 {agent.profileImage && (
-                  <div className="mt-4 p-4 bg-white rounded-xl border border-blue-100">
+                  <div className="mt-6 p-6 bg-white/80 rounded-2xl border border-blue-100">
                     <p className="text-xs text-blue-600">
                       <span className="font-semibold">تصویر پروفایل:</span> {agent.profileImage} → {getImagePath(agent.profileImage)}
                     </p>
@@ -297,40 +316,40 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
           {/* Properties Grid */}
           {loading ? (
             <div className="text-center py-16">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl mx-auto mb-6 flex items-center justify-center animate-pulse">
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl mx-auto mb-8 flex items-center justify-center animate-pulse">
                 <Camera className="w-8 h-8 text-white" />
               </div>
-              <p className="text-xl text-gray-500 font-medium">در حال بارگذاری املاک منحصر به فرد...</p>
+              <p className="text-2xl text-gray-500 font-medium">در حال بارگذاری املاک منحصر به فرد...</p>
             </div>
           ) : error ? (
             <div className="text-center py-16">
-              <div className="bg-white rounded-3xl p-12 shadow-xl border border-red-100 max-w-md mx-auto">
-                <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+              <div className="glass-effect rounded-3xl p-12 shadow-2xl border border-red-200/50 max-w-md mx-auto">
+                <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-3xl mx-auto mb-8 flex items-center justify-center">
                   <span className="text-white text-2xl">⚠️</span>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">امکان بارگذاری املاک وجود ندارد</h3>
-                <p className="text-red-600 mb-8 font-medium">{error}</p>
+                <h3 className="text-3xl font-bold text-gray-900 mb-6">امکان بارگذاری املاک وجود ندارد</h3>
+                <p className="text-red-600 mb-10 font-medium text-lg">{error}</p>
                 <button
                   onClick={() => {
                     setHasFetched(false)
                     setError(null)
                     fetchPosts()
                   }}
-                  className="px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-bold shadow-lg"
+                  className="px-10 py-5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-bold shadow-xl btn-glow text-lg"
                 >
                   تلاش مجدد
                 </button>
               </div>
             </div>
           ) : posts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="property-grid">
               {posts.map((post, index) => (
                 <Link key={post.id} href={`/agents/${agent.id}/posts/${post.id}`}>
-                  <div className="group bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2">
+                  <div className="property-card glass-effect rounded-3xl overflow-hidden shadow-xl border border-white/20 card-hover cursor-pointer animate-fade-in-up" style={{animationDelay: `${index * 0.1}s`}}>
                     {/* Post Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                    <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
                       <div className="flex items-center space-x-4 space-x-reverse">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center overflow-hidden">
+                        <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center overflow-hidden relative">
                           {agent.profileImage ? (
                             <ImageWithFallback
                               src={getImagePath(agent.profileImage)}
@@ -345,6 +364,7 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                               {getInitials(agent.name || agent.instagram || "مشاور املاک")}
                             </span>
                           )}
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
                         </div>
                         <div>
                           <p className="font-bold text-gray-900 text-lg">{agent.name || agent.instagram}</p>
@@ -356,13 +376,13 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                           </div>
                         </div>
                       </div>
-                      <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+                      <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
                         <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition-colors rotate-180" />
                       </div>
                     </div>
 
                     {/* Property Image */}
-                    <div className="relative h-80 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                    <div className="relative h-80 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
                       <ClientOnly
                         fallback={
                           <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
@@ -375,7 +395,7 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                             src={getImagePath(post.thumbnail || post.media?.thumbnail)}
                             alt={post.title || "املاک"}
                             fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                            className="object-cover group-hover:scale-110 transition-transform duration-700"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             fallbackSrc="/placeholder.jpg"
                           />
@@ -387,13 +407,13 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                       </ClientOnly>
                       
                       {/* Property Badge */}
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg">
+                      <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg animate-pulse">
                         ویژه
                       </div>
                     </div>
 
                     {/* Property Details */}
-                    <div className="p-6 text-right" dir="rtl">
+                    <div className="property-card-content p-6 text-right" dir="rtl">
                       <h3 className="font-bold text-gray-900 text-xl mb-3 line-clamp-2 group-hover:text-amber-600 transition-colors">
                         {post.title || post.caption?.substring(0, 60) + "..." || "آگهی املاک منحصر به فرد"}
                       </h3>
@@ -402,12 +422,12 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
                       </p>
                       
                       {/* Property Features */}
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div className="property-card-footer flex items-center justify-between pt-4 border-t border-gray-200/50 mt-auto">
                         <div className="flex items-center space-x-2 space-x-reverse text-gray-500">
                           <MapPin className="w-4 h-4" />
                           <span className="text-sm font-medium">دبی</span>
                         </div>
-                        <div className="flex items-center space-x-2 space-x-reverse text-amber-600 font-bold">
+                        <div className="flex items-center space-x-2 space-x-reverse text-amber-600 font-bold bg-amber-50 px-3 py-1 rounded-lg">
                           <span className="text-sm">مشاهده جزئیات</span>
                           <ArrowRight className="w-4 h-4 group-hover:-translate-x-1 transition-transform rotate-180" />
                         </div>
@@ -419,17 +439,17 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
             </div>
           ) : (
             <div className="text-center py-16">
-              <div className="bg-white rounded-3xl p-12 shadow-xl border border-gray-100 max-w-lg mx-auto">
-                <div className="w-20 h-20 bg-gradient-to-br from-gray-300 to-gray-400 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+              <div className="glass-effect rounded-3xl p-12 shadow-2xl border border-gray-200/50 max-w-lg mx-auto animate-bounce-in">
+                <div className="w-24 h-24 bg-gradient-to-br from-gray-300 to-gray-400 rounded-3xl mx-auto mb-8 flex items-center justify-center">
                   <Camera className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">هنوز املاکی وجود ندارد</h3>
-                <p className="text-gray-500 mb-8 text-lg">
+                <h3 className="text-3xl font-bold text-gray-900 mb-6">هنوز املاکی وجود ندارد</h3>
+                <p className="text-gray-500 mb-10 text-lg leading-relaxed">
                   {agent.name} در حال آماده‌سازی فهرست املاک منحصر به فرد است. به زودی برای فرصت‌های شگفت‌انگیز املاک بازگردید!
                 </p>
                 <Link
                   href={`/api/agents/${agent.id}/posts`}
-                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-bold shadow-lg"
+                  className="inline-flex items-center px-10 py-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-bold shadow-xl btn-glow text-lg"
                 >
                   بررسی وضعیت API
                 </Link>
@@ -439,12 +459,15 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="bg-gradient-to-br from-gray-50 via-white to-blue-50 rounded-3xl p-12 shadow-xl border border-gray-200 relative overflow-hidden">
+        <section id="contact" className="glass-effect rounded-3xl p-12 shadow-2xl border border-white/20 relative overflow-hidden animate-fade-in-up">
           {/* Decorative Background */}
-          <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-bl from-blue-100/20 to-indigo-100/20 rounded-full -translate-y-24 -translate-x-24 opacity-70"></div>
-          <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tr from-amber-100/20 to-orange-100/20 rounded-full translate-y-20 translate-x-20 opacity-70"></div>
+          <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-bl from-blue-200/20 to-indigo-200/20 rounded-full -translate-y-24 -translate-x-24 animate-float"></div>
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tr from-amber-200/20 to-orange-200/20 rounded-full translate-y-20 translate-x-20 animate-float" style={{animationDelay: '3s'}}></div>
           <div className="relative z-10">
             <div className="text-center mb-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl mx-auto mb-6 flex items-center justify-center animate-bounce-in">
+                <Sparkles className="w-10 h-10 text-white" />
+              </div>
               <h3 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight animate-fade-in-up">ارتباط با {agent.name}</h3>
               <p className="text-lg text-gray-600 font-medium max-w-3xl mx-auto leading-relaxed">
                 برای کشف املاک لوکس دبی با راهنمایی شخصی و فرصت‌های منحصر به فرد تماس بگیرید.
@@ -452,8 +475,8 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               <div className="max-w-lg mx-auto">
-                <div className="flex items-center justify-center p-8 bg-white rounded-2xl border-2 border-gray-100 shadow-lg">
-                  <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center ml-6">
+                <div className="flex items-center justify-center p-8 glass-effect rounded-3xl border border-white/20 shadow-xl card-hover">
+                  <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center ml-6 btn-glow">
                     <Instagram className="w-8 h-8 text-white" />
                   </div>
                   <div className="text-right">
@@ -468,47 +491,13 @@ export default function AgentPageClient({ agent }: AgentPageClientProps) {
         </section>
       </main>
 
-      {/* Premium Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white mt-24">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-4 space-x-reverse mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">د</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold">دبی الیت</h3>
-                  <p className="text-amber-400 font-medium">املاک لوکس</p>
-                </div>
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed max-w-md">
-                اتصال مشتریان باذوق با منحصر به فردترین املاک دبی از طریق شبکه متخصصان املاک نخبه ما.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-xl font-bold mb-6 text-amber-400">لینک‌های سریع</h4>
-              <div className="space-y-3">
-                <Link href="/" className="block text-gray-300 hover:text-white transition-colors text-lg">خانه</Link>
-                <Link href="#properties" className="block text-gray-300 hover:text-white transition-colors text-lg">املاک</Link>
-                <Link href="#contact" className="block text-gray-300 hover:text-white transition-colors text-lg">تماس</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">درباره ما</Link>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-xl font-bold mb-6 text-amber-400">قانونی</h4>
-              <div className="space-y-3">
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">سیاست حفظ حریم خصوصی</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">شرایط خدمات</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">تماس</Link>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-700 mt-12 pt-8 text-center">
-            <p className="text-gray-400 text-lg">&copy; ۲۰۲۴ بازار املاک دبی الیت. تمامی حقوق محفوظ است.</p>
+      {/* Minimal Footer */}
+      <footer className="mt-24 py-8 text-center relative z-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="glass-effect rounded-2xl p-6 border border-white/20">
+            <p className="text-gray-600 font-medium">
+              © ۲۰۲۴ دبی الیت - املاک لوکس. تمامی حقوق محفوظ است.
+            </p>
           </div>
         </div>
       </footer>

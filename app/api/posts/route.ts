@@ -20,7 +20,7 @@ export async function GET() {
         thumbnail,
         enhanced_content AS enhancedContent
       FROM posts 
-      ORDER BY date DESC, created_at DESC`
+      ORDER BY created_at DESC, date DESC`
     );
 
     const formattedPosts = (posts as any[]).map(post => ({

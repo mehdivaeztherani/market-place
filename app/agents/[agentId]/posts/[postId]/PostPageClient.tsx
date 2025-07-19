@@ -117,18 +117,26 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
   const isCaptionRTL = containsPersianText(post.caption || '')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 relative overflow-hidden" dir="rtl">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 pattern-dots opacity-30"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-200/20 to-orange-200/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-indigo-200/20 rounded-full blur-3xl"></div>
+
       {/* Premium Header */}
-      <header className="bg-white/95 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
+      <header className="glass-effect sticky top-0 z-50 shadow-lg border-b border-white/20">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between" dir="rtl">
             {/* Premium Logo */}
             <div className="flex items-center space-x-4 space-x-reverse">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">د</span>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-xl animate-float">
+                  <span className="text-white font-bold text-2xl">د</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold gradient-text">
                   دبی الیت
                 </h1>
                 <p className="text-sm text-amber-600 font-medium">املاک لوکس</p>
@@ -139,14 +147,14 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
             <nav className="flex items-center space-x-6 space-x-reverse">
               <Link 
                 href="/" 
-                className="flex items-center space-x-2 space-x-reverse text-gray-700 hover:text-amber-600 transition-all duration-200 font-medium group"
+                className="flex items-center space-x-2 space-x-reverse text-gray-700 hover:text-amber-600 transition-all duration-300 font-medium group"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 <span>خانه</span>
               </Link>
               <Link 
                 href={`/agents/${agent.id}`} 
-                className="text-gray-700 hover:text-amber-600 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-amber-50"
+                className="text-gray-700 hover:text-amber-600 transition-all duration-300 font-medium px-4 py-2 rounded-xl hover:bg-amber-50"
               >
                 پروفایل مشاور
               </Link>
@@ -155,9 +163,9 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         {/* Elegant Breadcrumb */}
-        <nav className="flex items-center space-x-3 space-x-reverse text-sm text-gray-500 mb-12">
+        <nav className="flex items-center space-x-3 space-x-reverse text-sm text-gray-500 mb-12 animate-slide-in-right">
           <Link href="/" className="hover:text-amber-600 transition-colors font-medium">خانه</Link>
           <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
           <Link href={`/agents/${agent.id}`} className="hover:text-amber-600 transition-colors font-medium">{agent.name}</Link>
@@ -166,13 +174,14 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         </nav>
 
         {/* Agent Header Card */}
-        <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 mb-12">
+        <div className="glass-effect rounded-3xl p-8 shadow-2xl border border-white/20 mb-12 animate-fade-in-up">
           <div className="flex items-center justify-between" dir="rtl">
             <div className="flex items-center space-x-6 space-x-reverse">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg relative">
                 <span className="text-white font-bold text-2xl">
                   {agent.name?.split(' ').map(n => n[0]).join('') || '?'}
                 </span>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">{agent.name}</h2>
@@ -191,7 +200,7 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
               </div>
             </div>
             
-            <div className="flex items-center space-x-2 space-x-reverse text-gray-500 bg-gray-50 px-4 py-2 rounded-xl">
+            <div className="flex items-center space-x-2 space-x-reverse text-gray-500 bg-amber-50 px-4 py-2 rounded-xl">
               <Calendar className="w-4 h-4" />
               <span className="font-medium">
                 {new Date(post.date).toLocaleDateString("en-US", {
@@ -205,14 +214,14 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         </div>
 
         {/* Post Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-12 text-right">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-12 text-right animate-fade-in-up">
           {post.title || `Exclusive Property by ${agent.name}`}
         </h1>
 
         {/* Main Image - Keep Original Design */}
         {(post.media?.thumbnail || post.thumbnail) && !imageError && (
-          <div className="mb-16">
-            <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden shadow-lg">
+          <div className="mb-16 animate-fade-in-up">
+            <div className="relative w-full bg-gray-100 rounded-3xl overflow-hidden shadow-2xl">
               <Image
                 src={imageSrc}
                 alt={post.title || "Post"}
@@ -234,8 +243,8 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
 
         {/* Show placeholder if image failed to load */}
         {imageError && (
-          <div className="mb-16">
-            <div className="relative w-full h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
+          <div className="mb-16 animate-fade-in-up">
+            <div className="relative w-full h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center">
               <div className="text-center">
                 <span className="text-gray-500 text-6xl mb-4 block">📷</span>
                 <p className="text-gray-600">Image not available</p>
@@ -246,13 +255,13 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         )}
 
         {/* Content Sections */}
-        <div className="space-y-12">
+        <div className="space-y-12 animate-fade-in-up">
           {/* Property Details */}
           {post.content && (
-            <section className="bg-white rounded-3xl p-10 shadow-xl border border-gray-100 relative overflow-hidden">
+            <section className="glass-effect rounded-3xl p-10 shadow-2xl border border-white/20 relative overflow-hidden">
               {/* Decorative Background */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-100 to-indigo-100 rounded-full translate-y-12 -translate-x-12 opacity-50"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-200/20 to-orange-200/20 rounded-full -translate-y-16 translate-x-16 animate-float"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/20 to-indigo-200/20 rounded-full translate-y-12 -translate-x-12 animate-float" style={{animationDelay: '2s'}}></div>
               
               <div className="relative z-10">
                 <div className="flex items-center mb-8">
@@ -269,10 +278,10 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
           )}
 
           {/* Original Caption */}
-          <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-10 border border-blue-100 relative overflow-hidden">
+          <section className="glass-effect rounded-3xl p-10 border border-blue-200/50 relative overflow-hidden">
             {/* Decorative Elements */}
-            <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full -translate-y-10 -translate-x-10 opacity-60"></div>
-            <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-purple-200 to-pink-200 rounded-full translate-y-8 translate-x-8 opacity-60"></div>
+            <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full -translate-y-10 -translate-x-10 animate-float"></div>
+            <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-purple-200/20 to-pink-200/20 rounded-full translate-y-8 translate-x-8 animate-float" style={{animationDelay: '3s'}}></div>
             
             <div className="relative z-10">
               <div className="flex items-center mb-8">
@@ -299,10 +308,10 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8 sm:space-x-reverse my-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8 sm:space-x-reverse my-16 animate-fade-in-up">
           <button 
             onClick={scrollToContact} 
-            className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white rounded-2xl hover:from-amber-600 hover:via-orange-600 hover:to-red-600 transition-all duration-300 font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+            className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white rounded-2xl hover:from-amber-600 hover:via-orange-600 hover:to-red-600 transition-all duration-300 font-bold text-lg shadow-xl btn-glow transform hover:scale-105"
           >
             تماس با مشاور
           </button>
@@ -310,14 +319,14 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
           <div className="relative">
             <button
               onClick={handleShare}
-              className="flex items-center space-x-3 space-x-reverse text-gray-700 hover:text-amber-600 transition-all duration-200 px-8 py-4 rounded-2xl hover:bg-amber-50 border-2 border-gray-200 hover:border-amber-200 font-semibold"
+              className="flex items-center space-x-3 space-x-reverse text-gray-700 hover:text-amber-600 transition-all duration-300 px-10 py-5 rounded-2xl glass-effect border border-white/20 hover:border-amber-200 font-semibold shadow-lg"
               title="Share this post"
             >
               <Share2 className="w-5 h-5" />
               <span>اشتراک‌گذاری املاک</span>
             </button>
             {showShareSuccess && (
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 px-6 py-3 bg-green-100 text-green-800 text-sm rounded-xl shadow-lg border border-green-200 font-medium">
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 px-6 py-3 glass-effect text-green-800 text-sm rounded-xl shadow-lg border border-green-200 font-medium animate-bounce-in">
                 لینک با موفقیت کپی شد! ✓
               </div>
             )}
@@ -328,7 +337,7 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
               href={post.originalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 transition-colors px-8 py-4 rounded-2xl hover:bg-blue-50 border-2 border-blue-200 hover:border-blue-300 font-semibold"
+              className="text-blue-600 hover:text-blue-800 transition-all duration-300 px-10 py-5 rounded-2xl glass-effect border border-blue-200/50 hover:border-blue-300 font-semibold shadow-lg"
             >
               مشاهده در اینستاگرام
             </a>
@@ -336,20 +345,23 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         </div>
 
         {/* Premium Contact Section */}
-        <section id="contact-info" className="bg-gradient-to-br from-white via-gray-50 to-amber-50/30 rounded-3xl p-12 shadow-2xl border border-gray-100 mt-20 relative overflow-hidden">
+        <section id="contact-info" className="glass-effect rounded-3xl p-12 shadow-2xl border border-white/20 mt-20 relative overflow-hidden animate-fade-in-up">
           {/* Decorative Background */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-amber-200 to-orange-200 rounded-full -translate-y-20 translate-x-20 opacity-30"></div>
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-200 to-indigo-200 rounded-full translate-y-16 -translate-x-16 opacity-30"></div>
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-amber-200/20 to-orange-200/20 rounded-full -translate-y-20 translate-x-20 animate-float"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-200/20 to-indigo-200/20 rounded-full translate-y-16 -translate-x-16 animate-float" style={{animationDelay: '4s'}}></div>
           
           <div className="relative z-10">
             <div className="text-center mb-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl mx-auto mb-6 flex items-center justify-center animate-bounce-in">
+                <Sparkles className="w-10 h-10 text-white" />
+              </div>
               <h3 className="text-4xl font-bold text-gray-900 mb-4">آماده کشف این املاک هستید؟</h3>
               <p className="text-xl text-gray-600 font-medium">برای دسترسی انحصاری و خدمات شخصی با {agent.name} تماس بگیرید</p>
             </div>
             
             <div className="max-w-lg mx-auto">
-              <div className="flex items-center justify-center p-8 bg-white rounded-2xl border-2 border-gray-100 shadow-lg">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6">
+              <div className="flex items-center justify-center p-8 glass-effect rounded-3xl border border-white/20 shadow-xl card-hover">
+                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 btn-glow">
                   <Instagram className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-left">
@@ -363,10 +375,10 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         </section>
 
         {/* Back to Profile */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-16 animate-fade-in-up">
           <Link 
             href={`/agents/${agent.id}`} 
-            className="inline-flex items-center space-x-3 space-x-reverse px-10 py-5 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="inline-flex items-center space-x-3 space-x-reverse px-12 py-6 glass-effect text-gray-700 rounded-2xl hover:bg-white/50 transition-all duration-300 font-bold text-lg shadow-xl border border-white/20 transform hover:scale-105"
           >
             <ArrowLeft className="w-6 h-6" />
             <span>بازگشت به نمونه کارهای {agent.name}</span>
@@ -378,54 +390,20 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 z-50"
+          className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 z-50 btn-glow animate-bounce-in"
           title="Back to top"
         >
           <ChevronUp className="w-8 h-8" />
         </button>
       )}
 
-      {/* Premium Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white mt-24">
-        <div className="max-w-7xl mx-auto px-6 py-16" dir="rtl">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-4 space-x-reverse mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">د</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold">دبی الیت</h3>
-                  <p className="text-amber-400 font-medium">املاک لوکس</p>
-                </div>
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed max-w-md">
-                اتصال مشتریان باذوق با منحصر به فردترین املاک دبی از طریق شبکه متخصصان املاک نخبه ما.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-xl font-bold mb-6 text-amber-400">لینک‌های سریع</h4>
-              <div className="space-y-3">
-                <Link href="/" className="block text-gray-300 hover:text-white transition-colors text-lg">خانه</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">املاک</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">مشاوران</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">درباره ما</Link>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-xl font-bold mb-6 text-amber-400">قانونی</h4>
-              <div className="space-y-3">
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">سیاست حفظ حریم خصوصی</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">شرایط خدمات</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">تماس</Link>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-700 mt-12 pt-8 text-center">
-            <p className="text-gray-400 text-lg">&copy; ۲۰۲۴ بازار املاک دبی الیت. تمامی حقوق محفوظ است.</p>
+      {/* Minimal Footer */}
+      <footer className="mt-24 py-8 text-center relative z-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="glass-effect rounded-2xl p-6 border border-white/20">
+            <p className="text-gray-600 font-medium">
+              © ۲۰۲۴ دبی الیت - املاک لوکس. تمامی حقوق محفوظ است.
+            </p>
           </div>
         </div>
       </footer>

@@ -23,7 +23,7 @@ export async function GET(request: Request, context: { params: { agentId: string
         thumbnail
       FROM posts 
       WHERE agent_id = ?
-      ORDER BY date DESC, created_at DESC`,
+      ORDER BY created_at DESC, date DESC`,
       [awaitedParams.agentId]
     );
 
