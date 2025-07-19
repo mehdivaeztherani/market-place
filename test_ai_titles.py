@@ -69,7 +69,11 @@ def generate_test_title(groq_client, content, caption="", agent_name=""):
                     "content": prompt
                 }
             ],
+<<<<<<< HEAD
             model="gemma2-9b-it",
+=======
+            model="llama-3.1-70b-versatile",
+>>>>>>> f050a1533b219fe630f34035c4fe0cc7fa66264b
             temperature=0.7,
             max_tokens=150,
             top_p=0.9
