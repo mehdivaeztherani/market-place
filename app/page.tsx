@@ -33,39 +33,39 @@ export default async function HomePage() {
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" dir="rtl">
             {/* Premium Logo */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 space-x-reverse">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">D</span>
+                <span className="text-white font-bold text-xl">د</span>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Dubai Elite
+                  دبی الیت
                 </h1>
-                <p className="text-sm text-amber-600 font-medium">Premium Real Estate</p>
+                <p className="text-sm text-amber-600 font-medium">املاک لوکس</p>
               </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-6 space-x-reverse">
               <Link 
                 href="/" 
                 className="text-gray-700 hover:text-amber-600 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-amber-50"
               >
-                Home
+                خانه
               </Link>
               <Link 
                 href="/api/test-db" 
                 className="text-gray-700 hover:text-amber-600 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-amber-50"
               >
-                Test DB
+                تست دیتابیس
               </Link>
               <Link 
                 href="#contact" 
                 className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-200 font-bold shadow-lg"
               >
-                Contact
+                تماس
               </Link>
             </nav>
           </div>
@@ -73,14 +73,14 @@ export default async function HomePage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-12" dir="rtl">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Dubai Elite Marketplace
+            بازار املاک دبی الیت
           </h1>
           <p className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-medium">
-            Connect with Dubai's top real estate professionals and discover your dream property in the world's most dynamic city
+            با بهترین متخصصان املاک دبی ارتباط برقرار کنید و خانه رویایی خود را در پویاترین شهر جهان کشف کنید
           </p>
         </div>
 
@@ -88,36 +88,36 @@ export default async function HomePage() {
         {process.env.NODE_ENV === 'development' && (
           <ClientOnly>
             <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-              <h3 className="text-lg font-bold text-blue-900 mb-3">Development Status</h3>
+              <h3 className="text-lg font-bold text-blue-900 mb-3">وضعیت توسعه</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="bg-white rounded-xl p-4 border border-blue-100">
-                  <p className="font-semibold text-blue-800">Database Status</p>
+                  <p className="font-semibold text-blue-800">وضعیت دیتابیس</p>
                   <p className={`font-medium ${error ? 'text-red-600' : 'text-green-600'}`}>
-                    {error ? 'Disconnected' : 'Connected'}
+                    {error ? 'قطع شده' : 'متصل'}
                   </p>
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-blue-100">
-                  <p className="font-semibold text-blue-800">Agents Found</p>
-                  <p className="text-blue-600">{agents?.length || 0} agents</p>
+                  <p className="font-semibold text-blue-800">مشاوران یافت شده</p>
+                  <p className="text-blue-600">{agents?.length || 0} مشاور</p>
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-blue-100">
-                  <p className="font-semibold text-blue-800">System</p>
+                  <p className="font-semibold text-blue-800">سیستم</p>
                   <p className="text-green-600">MySQL + Next.js</p>
                 </div>
               </div>
               {error && (
                 <div className="mt-4 p-4 bg-red-50 rounded-xl border border-red-200">
-                  <p className="text-red-800 font-medium">Error: {error}</p>
+                  <p className="text-red-800 font-medium">خطا: {error}</p>
                 </div>
               )}
               {agents && agents.length > 0 && (
                 <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
                   <p className="text-green-800 font-medium">
-                    Sample agent: {agents[0]?.name} ({agents[0]?.id})
+                    مشاور نمونه: {agents[0]?.name} ({agents[0]?.id})
                   </p>
                   {agents[0]?.profileImage && (
                     <p className="text-xs text-green-600 mt-1">
-                      Profile image: {agents[0].profileImage} → {getImagePath(agents[0].profileImage)}
+                      تصویر پروفایل: {agents[0].profileImage} → {getImagePath(agents[0].profileImage)}
                     </p>
                   )}
                 </div>
@@ -151,13 +151,13 @@ export default async function HomePage() {
 
                   {/* Agent Name */}
                   <h3 className="text-2xl font-bold text-gray-900 text-center mb-3 group-hover:text-amber-600 transition-colors">
-                    {agent.name || 'Unknown Agent'}
+                    {agent.name || 'مشاور ناشناس'}
                   </h3>
 
                   {/* Agent Details */}
                   <div className="text-center space-y-2 mb-6">
-                    <p className="text-gray-600 font-medium">Real Estate Professional</p>
-                    <p className="text-gray-500 text-sm">{agent.address || 'Dubai, UAE'}</p>
+                    <p className="text-gray-600 font-medium">متخصص املاک</p>
+                    <p className="text-gray-500 text-sm">{agent.address || 'دبی، امارات'}</p>
                   </div>
 
                   {/* Bio Preview */}
@@ -175,13 +175,13 @@ export default async function HomePage() {
                       </p>
                     )}
                     <p className="text-xs text-gray-500 text-center">
-                      Contact via Instagram
+                      تماس از طریق اینستاگرام
                     </p>
                   </div>
 
                   {/* Hover Effect */}
                   <div className="mt-6 text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-amber-600 font-bold text-sm">View Profile →</span>
+                    <span className="text-amber-600 font-bold text-sm">مشاهده پروفایل ←</span>
                   </div>
                 </div>
               </Link>
@@ -194,12 +194,12 @@ export default async function HomePage() {
                 <span className="text-white text-3xl">📊</span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                {error ? 'Database Connection Issue' : 'No Agents Found'}
+                {error ? 'مشکل اتصال به دیتابیس' : 'مشاوری یافت نشد'}
               </h3>
               <p className="text-gray-500 mb-8 text-lg leading-relaxed">
                 {error 
-                  ? 'Please check your MySQL database connection and ensure the tables are created.' 
-                  : 'No agents are currently available in the database.'
+                  ? 'لطفاً اتصال دیتابیس MySQL خود را بررسی کنید و اطمینان حاصل کنید که جداول ایجاد شده‌اند.' 
+                  : 'در حال حاضر هیچ مشاوری در دیتابیس موجود نیست.'
                 }
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -207,13 +207,13 @@ export default async function HomePage() {
                   href="/api/test-db" 
                   className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-bold shadow-lg"
                 >
-                  Test Database Connection
+                  تست اتصال دیتابیس
                 </Link>
                 <Link 
                   href="/api/agents" 
                   className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-bold shadow-lg"
                 >
-                  Check Agents API
+                  بررسی API مشاوران
                 </Link>
               </div>
             </div>
@@ -223,45 +223,45 @@ export default async function HomePage() {
 
       {/* Footer */}
       <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white mt-24">
-        <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="max-w-7xl mx-auto px-6 py-16" dir="rtl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="md:col-span-2">
-              <div className="flex items-center space-x-4 mb-6">
+              <div className="flex items-center space-x-4 space-x-reverse mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">D</span>
+                  <span className="text-white font-bold text-xl">د</span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold">Dubai Elite</h3>
-                  <p className="text-amber-400 font-medium">Premium Real Estate</p>
+                  <h3 className="text-2xl font-bold">دبی الیت</h3>
+                  <p className="text-amber-400 font-medium">املاک لوکس</p>
                 </div>
               </div>
               <p className="text-gray-300 text-lg leading-relaxed max-w-md">
-                Connecting discerning clients with Dubai's most exclusive properties through our network of elite real estate professionals.
+                اتصال مشتریان باذوق با منحصر به فردترین املاک دبی از طریق شبکه متخصصان املاک نخبه ما.
               </p>
             </div>
             
             <div>
-              <h4 className="text-xl font-bold mb-6 text-amber-400">Quick Links</h4>
+              <h4 className="text-xl font-bold mb-6 text-amber-400">لینک‌های سریع</h4>
               <div className="space-y-3">
-                <Link href="/" className="block text-gray-300 hover:text-white transition-colors text-lg">Home</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">Properties</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">Agents</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">About</Link>
+                <Link href="/" className="block text-gray-300 hover:text-white transition-colors text-lg">خانه</Link>
+                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">املاک</Link>
+                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">مشاوران</Link>
+                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">درباره ما</Link>
               </div>
             </div>
             
             <div>
-              <h4 className="text-xl font-bold mb-6 text-amber-400">Legal</h4>
+              <h4 className="text-xl font-bold mb-6 text-amber-400">قانونی</h4>
               <div className="space-y-3">
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">Privacy Policy</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">Terms of Service</Link>
-                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">Contact</Link>
+                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">سیاست حفظ حریم خصوصی</Link>
+                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">شرایط خدمات</Link>
+                <Link href="#" className="block text-gray-300 hover:text-white transition-colors text-lg">تماس</Link>
               </div>
             </div>
           </div>
           
           <div className="border-t border-gray-700 mt-12 pt-8 text-center">
-            <p className="text-gray-400 text-lg">&copy; 2024 Dubai Elite Real Estate Marketplace. All rights reserved.</p>
+            <p className="text-gray-400 text-lg">&copy; ۲۰۲۴ بازار املاک دبی الیت. تمامی حقوق محفوظ است.</p>
           </div>
         </div>
       </footer>

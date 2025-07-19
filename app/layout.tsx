@@ -3,8 +3,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Dubai Agents Marketplace",
-  description: "Professional marketplace for real estate agents in Dubai",
+  title: "بازار املاک دبی الیت",
+  description: "بازار حرفه‌ای برای مشاوران املاک در دبی",
   generator: 'v0.dev'
 }
 
