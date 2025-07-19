@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import Link from "next/link"
 
 export default function NotFound() {
@@ -14,5 +13,3 @@ export default function NotFound() {
     </div>
   )
 }
-=======
->>>>>>> f050a1533b219fe630f34035c4fe0cc7fa66264b
