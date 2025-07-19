@@ -289,14 +289,14 @@ export default function PostPageClient({ agent, post }: PostPageClientProps) {
         </div>
 
         {/* Enhanced Content */}
-        {post.transcription && (
+        {/* {post.transcription && (
           <div className="mt-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">محتوای تکمیلی</h2>
             <div className="prose prose-xl max-w-none text-right" dir="rtl">
               {post.transcription}
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8 sm:space-x-reverse my-16">
