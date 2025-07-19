@@ -3,7 +3,7 @@ import Link from "next/link"
 import ClientOnly from "@/components/ClientOnly"
 import ImageWithFallback from "@/components/ImageWithFallback"
 import { getImagePath, getInitials } from "@/lib/utils/imageUtils"
-import { Search, Star, MapPin, Phone, Instagram, ArrowLeft, Sparkles, TrendingUp, Award, Users } from "lucide-react"
+import { Search, Star, MapPin, Phone, Instagram, ArrowLeft, Award, Users, Building, TrendingUp, Crown, Sparkles } from "lucide-react"
 
 export default async function HomePage() {
   let agents: any[] = [];
@@ -29,152 +29,136 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 pattern-dots opacity-30"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-200/20 to-orange-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-indigo-200/20 rounded-full blur-3xl"></div>
+    <div className="min-h-screen luxury-bg relative" dir="rtl">
+      {/* Subtle background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-20 w-72 h-72 bg-gradient-to-br from-slate-100/40 to-slate-200/40 rounded-full blur-3xl animate-luxury-float"></div>
+        <div className="absolute bottom-20 left-20 w-64 h-64 bg-gradient-to-tr from-blue-50/60 to-indigo-50/60 rounded-full blur-3xl animate-luxury-float" style={{animationDelay: '4s'}}></div>
+      </div>
 
-      {/* Header */}
-      <header className="glass-effect sticky top-0 z-50 shadow-lg border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between" dir="rtl">
-            {/* Premium Logo */}
-            <div className="flex items-center space-x-4 space-x-reverse animate-slide-in-right">
+      {/* Minimal Header */}
+      <header className="relative z-50 border-b minimal-border bg-white/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-8 py-6">
+          <div className="flex items-center justify-between">
+            {/* Elegant Logo */}
+            <div className="flex items-center space-x-6 space-x-reverse">
               <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-xl animate-float">
-                  <span className="text-white font-bold text-2xl">د</span>
+                <div className="w-12 h-12 luxury-gradient rounded-xl flex items-center justify-center luxury-shadow">
+                  <Crown className="w-6 h-6 text-white" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 status-premium rounded-full"></div>
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-3xl font-bold gradient-text">
-                  دبی الیت
-                </h1>
-                <p className="text-sm text-amber-600 font-medium">املاک لوکس و منحصر به فرد</p>
+              <div>
+                <h1 className="text-2xl luxury-heading text-luxury">دبی الیت</h1>
+                <p className="text-sm text-slate-500 luxury-text">املاک لوکس و منحصر به فرد</p>
               </div>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex items-center space-x-6 space-x-reverse">
+            {/* Minimal Navigation */}
+            <nav className="flex items-center space-x-8 space-x-reverse">
               <Link 
                 href="/" 
-                className="text-gray-700 hover:text-amber-600 transition-all duration-300 font-medium px-4 py-2 rounded-xl hover:bg-amber-50 relative group"
+                className="text-slate-700 hover:text-slate-900 transition-colors luxury-text font-medium"
               >
-                <span className="relative z-10">خانه</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                خانه
               </Link>
               <Link 
                 href="/api/test-db" 
-                className="text-gray-700 hover:text-amber-600 transition-all duration-300 font-medium px-4 py-2 rounded-xl hover:bg-amber-50"
+                className="text-slate-500 hover:text-slate-700 transition-colors luxury-text"
               >
-                تست دیتابیس
+                سیستم
               </Link>
-              <Link 
-                href="#contact" 
-                className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-3 rounded-2xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 font-bold shadow-xl btn-glow transform hover:scale-105"
-              >
+              <button className="luxury-button px-6 py-3 rounded-xl luxury-text font-medium">
                 تماس با ما
-              </Link>
+              </button>
             </nav>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12 relative z-10" dir="rtl">
+      <main className="max-w-7xl mx-auto px-8 relative z-10">
         {/* Hero Section */}
-        <div className="text-center mb-20 animate-fade-in-up">
-          <div className="inline-flex items-center space-x-2 space-x-reverse bg-gradient-to-r from-amber-100 to-orange-100 px-6 py-3 rounded-full mb-8 animate-bounce-in">
-            <Sparkles className="w-5 h-5 text-amber-600" />
-            <span className="text-amber-800 font-medium">بهترین مشاوران املاک دبی</span>
-            <Sparkles className="w-5 h-5 text-amber-600" />
-          </div>
-          
-          <h1 className="text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight">
-            <span className="gradient-text">دبی الیت</span>
-            <br />
-            <span className="text-gray-700">بازار املاک لوکس</span>
-          </h1>
-          
-          <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-medium mb-12">
-            با بهترین متخصصان املاک دبی ارتباط برقرار کنید و خانه رویایی خود را در پویاترین شهر جهان کشف کنید
-          </p>
+        <section className="luxury-section text-center">
+          <div className="max-w-4xl mx-auto animate-slide-up">
+            {/* Premium Badge */}
+            <div className="inline-flex items-center space-x-3 space-x-reverse bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full minimal-border mb-8">
+              <div className="w-2 h-2 status-premium rounded-full"></div>
+              <span className="text-slate-600 luxury-text font-medium">بهترین مشاوران املاک دبی</span>
+            </div>
+            
+            <h1 className="text-6xl lg:text-7xl luxury-heading text-luxury mb-8 leading-tight">
+              املاک لوکس
+              <br />
+              <span className="text-gold">دبی</span>
+            </h1>
+            
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed luxury-text mb-12">
+              با متخصصان برتر املاک دبی ارتباط برقرار کنید و در پویاترین بازار املاک جهان سرمایه‌گذاری کنید
+            </p>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
-            <div className="glass-effect rounded-2xl p-6 text-center animate-bounce-in" style={{animationDelay: '0.1s'}}>
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Users className="w-6 h-6 text-white" />
+            {/* Elegant Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+              <div className="text-center animate-scale-in" style={{animationDelay: '0.1s'}}>
+                <div className="text-3xl luxury-heading text-luxury mb-2">{agents?.length || 0}+</div>
+                <div className="text-slate-500 luxury-text">مشاور متخصص</div>
               </div>
-              <div className="text-2xl font-bold text-gray-900">{agents?.length || 0}+</div>
-              <div className="text-sm text-gray-600 font-medium">مشاور متخصص</div>
-            </div>
-            
-            <div className="glass-effect rounded-2xl p-6 text-center animate-bounce-in" style={{animationDelay: '0.2s'}}>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <TrendingUp className="w-6 h-6 text-white" />
+              
+              <div className="text-center animate-scale-in" style={{animationDelay: '0.2s'}}>
+                <div className="text-3xl luxury-heading text-luxury mb-2">500+</div>
+                <div className="text-slate-500 luxury-text">املاک فروخته شده</div>
               </div>
-              <div className="text-2xl font-bold text-gray-900">500+</div>
-              <div className="text-sm text-gray-600 font-medium">املاک فروخته شده</div>
-            </div>
-            
-            <div className="glass-effect rounded-2xl p-6 text-center animate-bounce-in" style={{animationDelay: '0.3s'}}>
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Award className="w-6 h-6 text-white" />
+              
+              <div className="text-center animate-scale-in" style={{animationDelay: '0.3s'}}>
+                <div className="text-3xl luxury-heading text-luxury mb-2">98%</div>
+                <div className="text-slate-500 luxury-text">رضایت مشتریان</div>
               </div>
-              <div className="text-2xl font-bold text-gray-900">98%</div>
-              <div className="text-sm text-gray-600 font-medium">رضایت مشتریان</div>
-            </div>
-            
-            <div className="glass-effect rounded-2xl p-6 text-center animate-bounce-in" style={{animationDelay: '0.4s'}}>
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Star className="w-6 h-6 text-white" />
+              
+              <div className="text-center animate-scale-in" style={{animationDelay: '0.4s'}}>
+                <div className="text-3xl luxury-heading text-luxury mb-2">5.0</div>
+                <div className="text-slate-500 luxury-text">امتیاز متوسط</div>
               </div>
-              <div className="text-2xl font-bold text-gray-900">5.0</div>
-              <div className="text-sm text-gray-600 font-medium">امتیاز متوسط</div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Debug Info - Only show in development */}
+        {/* Debug Info - Development Only */}
         {process.env.NODE_ENV === 'development' && (
           <ClientOnly>
-            <div className="mb-12 glass-effect rounded-3xl p-8 border border-blue-200/50 animate-fade-in-up">
-              <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center">
-                <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full ml-3"></div>
-                وضعیت توسعه
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white/80 rounded-2xl p-6 border border-blue-100">
-                  <p className="font-semibold text-blue-800 mb-2">وضعیت دیتابیس</p>
-                  <p className={`font-bold text-lg ${error ? 'text-red-600' : 'text-green-600'}`}>
-                    {error ? 'قطع شده' : 'متصل'}
-                  </p>
+            <div className="mb-16">
+              <div className="luxury-card rounded-2xl p-8 luxury-shadow">
+                <h3 className="text-xl luxury-heading text-luxury mb-6">وضعیت سیستم</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-slate-50/50 rounded-xl p-6 minimal-border">
+                    <p className="luxury-text font-medium text-slate-700 mb-2">وضعیت دیتابیس</p>
+                    <p className={`luxury-text font-semibold ${error ? 'text-red-600' : 'text-emerald-600'}`}>
+                      {error ? 'قطع شده' : 'متصل'}
+                    </p>
+                  </div>
+                  <div className="bg-slate-50/50 rounded-xl p-6 minimal-border">
+                    <p className="luxury-text font-medium text-slate-700 mb-2">مشاوران یافت شده</p>
+                    <p className="text-slate-900 luxury-text font-semibold">{agents?.length || 0} مشاور</p>
+                  </div>
+                  <div className="bg-slate-50/50 rounded-xl p-6 minimal-border">
+                    <p className="luxury-text font-medium text-slate-700 mb-2">سیستم</p>
+                    <p className="text-emerald-600 luxury-text font-semibold">MySQL + Next.js</p>
+                  </div>
                 </div>
-                <div className="bg-white/80 rounded-2xl p-6 border border-blue-100">
-                  <p className="font-semibold text-blue-800 mb-2">مشاوران یافت شده</p>
-                  <p className="text-blue-600 font-bold text-lg">{agents?.length || 0} مشاور</p>
-                </div>
-                <div className="bg-white/80 rounded-2xl p-6 border border-blue-100">
-                  <p className="font-semibold text-blue-800 mb-2">سیستم</p>
-                  <p className="text-green-600 font-bold text-lg">MySQL + Next.js</p>
-                </div>
+                {error && (
+                  <div className="mt-6 p-6 bg-red-50 rounded-xl minimal-border">
+                    <p className="text-red-800 luxury-text">{error}</p>
+                  </div>
+                )}
               </div>
-              {error && (
-                <div className="mt-6 p-6 bg-red-50 rounded-2xl border border-red-200">
-                  <p className="text-red-800 font-medium">خطا: {error}</p>
-                </div>
-              )}
             </div>
           </ClientOnly>
         )}
 
         {/* Agents Section */}
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">مشاوران برتر املاک</h2>
-            <p className="text-xl text-gray-600 font-medium">با بهترین متخصصان املاک دبی آشنا شوید</p>
+        <section className="mb-24">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl luxury-heading text-luxury mb-4">مشاوران برتر</h2>
+            <p className="text-xl text-slate-600 luxury-text">متخصصان املاک لوکس دبی</p>
           </div>
 
           {/* Agent Cards Grid */}
@@ -182,73 +166,71 @@ export default async function HomePage() {
             <div className="property-grid">
               {agents.map((agent, index) => (
                 <Link key={agent.id} href={`/agents/${agent.id}`}>
-                  <div className="property-card glass-effect rounded-3xl p-8 card-hover border border-white/20 shadow-xl animate-fade-in-up" style={{animationDelay: `${index * 0.1}s`}}>
+                  <div className="property-card luxury-card rounded-2xl overflow-hidden luxury-shadow elegant-hover animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                     <div className="property-card-content">
-                      {/* Profile Image */}
-                      <div className="relative mx-auto mb-6">
-                        <div className="w-32 h-32 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl group-hover:shadow-3xl transition-shadow">
-                          {agent.profileImage ? (
-                            <ImageWithFallback
-                              src={getImagePath(agent.profileImage)}
-                              alt={agent.name || "Agent"}
-                              fill
-                              className="object-cover"
-                              fallbackSrc="/placeholder-user.jpg"
-                            />
-                          ) : (
-                            <span className="text-white font-bold text-3xl">
-                              {getInitials(agent.name || "Agent")}
-                            </span>
-                          )}
+                      {/* Agent Header */}
+                      <div className="p-8 text-center">
+                        <div className="relative mx-auto mb-6 w-24 h-24">
+                          <div className="w-full h-full luxury-gradient rounded-2xl flex items-center justify-center luxury-shadow-lg relative overflow-hidden">
+                            {agent.profileImage ? (
+                              <ImageWithFallback
+                                src={getImagePath(agent.profileImage)}
+                                alt={agent.name || "Agent"}
+                                fill
+                                className="object-cover"
+                                fallbackSrc="/placeholder-user.jpg"
+                              />
+                            ) : (
+                              <span className="text-white luxury-text font-semibold text-xl">
+                                {getInitials(agent.name || "Agent")}
+                              </span>
+                            )}
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 status-online rounded-full border-2 border-white"></div>
                         </div>
-                        {/* Online indicator */}
-                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-400 rounded-full border-4 border-white flex items-center justify-center animate-pulse">
-                          <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                        </div>
-                      </div>
 
-                      {/* Agent Info */}
-                      <div className="text-center mb-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">
+                        <h3 className="text-xl luxury-heading text-luxury mb-2">
                           {agent.name || 'مشاور ناشناس'}
                         </h3>
                         
-                        <div className="flex items-center justify-center space-x-2 space-x-reverse text-gray-600 mb-3">
-                          <MapPin className="w-4 h-4 text-amber-500" />
-                          <span className="font-medium">{agent.address || 'دبی، امارات'}</span>
+                        <div className="flex items-center justify-center space-x-2 space-x-reverse text-slate-500 mb-4">
+                          <MapPin className="w-4 h-4" />
+                          <span className="luxury-text text-sm">{agent.address || 'دبی، امارات'}</span>
                         </div>
 
-                        <div className="flex items-center justify-center space-x-1 space-x-reverse mb-4">
+                        <div className="flex items-center justify-center space-x-1 space-x-reverse mb-6">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                            <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                           ))}
-                          <span className="text-sm text-gray-600 mr-2 font-medium">(4.9)</span>
+                          <span className="text-sm text-slate-500 mr-2 luxury-text">(4.9)</span>
                         </div>
                       </div>
 
                       {/* Bio Preview */}
                       {agent.bio && (
-                        <p className="text-gray-600 text-center text-sm leading-relaxed mb-6 line-clamp-3">
-                          {agent.bio}
-                        </p>
+                        <div className="px-8 pb-6">
+                          <p className="text-slate-600 text-center luxury-text leading-relaxed line-clamp-3">
+                            {agent.bio}
+                          </p>
+                        </div>
                       )}
                     </div>
 
                     {/* Footer */}
-                    <div className="property-card-footer">
-                      <div className="pt-6 border-t border-gray-200/50 space-y-3">
+                    <div className="property-card-footer p-8 pt-0">
+                      <div className="space-y-4">
                         {agent.instagram && (
-                          <div className="flex items-center justify-center space-x-2 space-x-reverse text-pink-600">
+                          <div className="flex items-center justify-center space-x-2 space-x-reverse text-slate-500">
                             <Instagram className="w-4 h-4" />
-                            <span className="text-sm font-medium">@{agent.instagram}</span>
+                            <span className="luxury-text text-sm">@{agent.instagram}</span>
                           </div>
                         )}
                         
                         <div className="text-center">
-                          <span className="inline-flex items-center space-x-2 space-x-reverse text-amber-600 font-bold text-sm bg-amber-50 px-4 py-2 rounded-xl">
+                          <div className="inline-flex items-center space-x-2 space-x-reverse text-slate-700 luxury-text font-medium bg-slate-50 px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors">
                             <span>مشاهده پروفایل</span>
-                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform rotate-180" />
-                          </span>
+                            <ArrowLeft className="w-4 h-4 rotate-180" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -258,31 +240,31 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="glass-effect rounded-3xl p-12 shadow-2xl border border-gray-200/50 max-w-lg mx-auto animate-bounce-in">
-                <div className="w-24 h-24 bg-gradient-to-br from-gray-300 to-gray-400 rounded-3xl mx-auto mb-8 flex items-center justify-center">
-                  <span className="text-white text-4xl">📊</span>
+              <div className="luxury-card rounded-2xl p-12 luxury-shadow max-w-lg mx-auto">
+                <div className="w-16 h-16 luxury-gradient rounded-2xl mx-auto mb-8 flex items-center justify-center">
+                  <Building className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-6">
+                <h3 className="text-2xl luxury-heading text-luxury mb-6">
                   {error ? 'مشکل اتصال به دیتابیس' : 'مشاوری یافت نشد'}
                 </h3>
-                <p className="text-gray-500 mb-10 text-lg leading-relaxed">
+                <p className="text-slate-600 mb-10 luxury-text leading-relaxed">
                   {error 
-                    ? 'لطفاً اتصال دیتابیس MySQL خود را بررسی کنید و اطمینان حاصل کنید که جداول ایجاد شده‌اند.' 
+                    ? 'لطفاً اتصال دیتابیس MySQL خود را بررسی کنید.' 
                     : 'در حال حاضر هیچ مشاوری در دیتابیس موجود نیست.'
                   }
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link 
                     href="/api/test-db" 
-                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-bold shadow-xl btn-glow"
+                    className="luxury-button px-6 py-3 rounded-xl luxury-text font-medium"
                   >
                     تست اتصال دیتابیس
                   </Link>
                   <Link 
                     href="/api/agents" 
-                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl hover:from-green-600 hover:to-green-700 transition-all duration-300 font-bold shadow-xl btn-glow"
+                    className="luxury-button px-6 py-3 rounded-xl luxury-text font-medium"
                   >
-                    بررسی API مشاوران
+                    بررسی API
                   </Link>
                 </div>
               </div>
@@ -291,35 +273,38 @@ export default async function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="text-center py-20 relative">
-          <div className="glass-effect rounded-3xl p-12 shadow-2xl border border-white/20 max-w-4xl mx-auto animate-fade-in-up">
+        <section className="text-center py-20">
+          <div className="luxury-card rounded-2xl p-12 luxury-shadow max-w-4xl mx-auto">
             <div className="mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl mx-auto mb-6 flex items-center justify-center animate-float">
-                <Sparkles className="w-10 h-10 text-white" />
+              <div className="w-16 h-16 gold-accent rounded-2xl mx-auto mb-6 flex items-center justify-center luxury-shadow">
+                <Sparkles className="w-8 h-8 text-slate-800" />
               </div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">آماده برای شروع هستید؟</h2>
-              <p className="text-xl text-gray-600 leading-relaxed">
-                با مشاوران برتر املاک دبی در تماس باشید و بهترین فرصت‌های سرمایه‌گذاری را کشف کنید
+              <h2 className="text-3xl luxury-heading text-luxury mb-4">آماده برای شروع؟</h2>
+              <p className="text-xl text-slate-600 luxury-text leading-relaxed">
+                با مشاوران برتر املاک دبی در تماس باشید
               </p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link 
-                href="#agents" 
-                className="inline-flex items-center px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-2xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 font-bold shadow-xl btn-glow text-lg transform hover:scale-105"
-              >
+              <button className="gold-button px-8 py-4 rounded-xl luxury-text font-medium">
                 مشاهده مشاوران
-              </Link>
-              <Link 
-                href="#contact" 
-                className="inline-flex items-center px-10 py-5 bg-white text-gray-900 rounded-2xl hover:bg-gray-50 transition-all duration-300 font-bold shadow-xl border-2 border-gray-200 text-lg transform hover:scale-105"
-              >
+              </button>
+              <button className="luxury-button px-8 py-4 rounded-xl luxury-text font-medium">
                 تماس با ما
-              </Link>
+              </button>
             </div>
           </div>
         </section>
       </main>
+
+      {/* Minimal Footer */}
+      <div className="border-t minimal-border bg-white/60 backdrop-blur-sm mt-24">
+        <div className="max-w-7xl mx-auto px-8 py-8 text-center">
+          <p className="text-slate-500 luxury-text">
+            © ۲۰۲۴ دبی الیت. تمامی حقوق محفوظ است.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
