@@ -2,27 +2,31 @@ import mysql from 'mysql2/promise';
 
 // Create connection pool for better performance
 export const db = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'metro.proxy.rlwy.net',
+  port: parseInt(process.env.DB_PORT || '46806'),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '00eability',
-  database: process.env.DB_NAME || 'dubai_marketplace',
+  password: process.env.DB_PASSWORD || 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh',
+  database: process.env.DB_NAME || 'railway',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   acquireTimeout: 60000,
   timeout: 60000,
-  reconnect: true
+  reconnect: true,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Test database connection
 export async function testConnection() {
   try {
     const connection = await db.getConnection();
-    console.log('✅ Database connected successfully');
+    console.log('✅ Railway MySQL Database connected successfully');
     connection.release();
     return true;
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.error('❌ Railway MySQL Database connection failed:', error);
     return false;
   }
 }

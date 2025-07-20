@@ -30,12 +30,15 @@ client = OpenAI(
 
 # Database configuration
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
+    'host': os.getenv('DB_HOST', 'metro.proxy.rlwy.net'),
+    'port': int(os.getenv('DB_PORT', '46806')),
     'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', '00eability'),
-    'database': os.getenv('DB_NAME', 'dubai_marketplace'),
+    'password': os.getenv('DB_PASSWORD', 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh'),
+    'database': os.getenv('DB_NAME', 'railway'),
     'charset': 'utf8mb4',
-    'collation': 'utf8mb4_unicode_ci'
+    'collation': 'utf8mb4_unicode_ci',
+    'ssl_disabled': False,
+    'autocommit': True
 }
 
 try:
