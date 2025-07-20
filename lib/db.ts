@@ -10,23 +10,36 @@ export const db = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true,
+  acquireTimeout: 30000,
+  connectTimeout: 30000,
+  idleTimeout: 900000,
   ssl: {
     rejectUnauthorized: false
-  }
+  },
+  charset: 'utf8mb4'
 });
 
 // Test database connection
 export async function testConnection() {
   try {
+    console.log('🔄 Attempting to connect to Railway MySQL...');
+    console.log(`📍 Host: ${process.env.DB_HOST || 'metro.proxy.rlwy.net'}`);
+    console.log(`🔌 Port: ${process.env.DB_PORT || '46806'}`);
+    console.log(`🗄️  Database: ${process.env.DB_NAME || 'railway'}`);
+    
     const connection = await db.getConnection();
     console.log('✅ Railway MySQL Database connected successfully');
     connection.release();
     return true;
   } catch (error) {
-    console.error('❌ Railway MySQL Database connection failed:', error);
+    console.error('❌ Railway MySQL Database connection failed:');
+    console.error('Error details:', error);
+    console.error('Connection config:', {
+      host: process.env.DB_HOST || 'metro.proxy.rlwy.net',
+      port: process.env.DB_PORT || '46806',
+      database: process.env.DB_NAME || 'railway',
+      user: process.env.DB_USER || 'root'
+    });
     return false;
   }
 }

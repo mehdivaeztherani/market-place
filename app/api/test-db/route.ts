@@ -4,13 +4,24 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     console.log('🔍 Testing database connection...');
+    console.log('🌐 Environment check:');
+    console.log(`   DB_HOST: ${process.env.DB_HOST}`);
+    console.log(`   DB_PORT: ${process.env.DB_PORT}`);
+    console.log(`   DB_NAME: ${process.env.DB_NAME}`);
+    console.log(`   DB_USER: ${process.env.DB_USER}`);
     
     // Test connection
     const isConnected = await testConnection();
     if (!isConnected) {
       return NextResponse.json({ 
         error: "Database connection failed",
-        connected: false 
+        connected: false,
+        config: {
+          host: process.env.DB_HOST,
+          port: process.env.DB_PORT,
+          database: process.env.DB_NAME,
+          user: process.env.DB_USER
+        }
       }, { status: 500 });
     }
 
@@ -31,6 +42,8 @@ export async function GET() {
       return NextResponse.json({
         connected: true,
         message: "Database connection successful!",
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
         data: {
           agents: agentCount,
           posts: postCount
@@ -48,7 +61,13 @@ export async function GET() {
     return NextResponse.json({ 
       error: "Database test failed",
       details: error instanceof Error ? error.message : 'Unknown error',
-      connected: false 
+      connected: false,
+      config: {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER
+      }
     }, { status: 500 });
   }
 }
