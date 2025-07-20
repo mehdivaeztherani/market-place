@@ -5,10 +5,11 @@ export async function GET() {
   try {
     console.log('🔍 Testing database connection...');
     console.log('🌐 Environment check:');
-    console.log(`   DB_HOST: ${process.env.DB_HOST}`);
-    console.log(`   DB_PORT: ${process.env.DB_PORT}`);
-    console.log(`   DB_NAME: ${process.env.DB_NAME}`);
-    console.log(`   DB_USER: ${process.env.DB_USER}`);
+    console.log(`   DB_HOST: ${process.env.DB_HOST || 'mysql-production-308f.up.railway.app'}`);
+    console.log(`   DB_PORT: ${process.env.DB_PORT || '3306'}`);
+    console.log(`   DB_NAME: ${process.env.DB_NAME || 'railway'}`);
+    console.log(`   DB_USER: ${process.env.DB_USER || 'root'}`);
+    console.log(`   SSL: enabled with rejectUnauthorized: false`);
     
     // Test connection
     const isConnected = await testConnection();

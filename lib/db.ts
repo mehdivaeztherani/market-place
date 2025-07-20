@@ -2,8 +2,8 @@ import mysql from 'mysql2/promise';
 
 // Create connection pool for better performance
 export const db = mysql.createPool({
-  host: process.env.DB_HOST || 'metro.proxy.rlwy.net',
-  port: parseInt(process.env.DB_PORT || '46806'),
+  host: process.env.DB_HOST || 'mysql-production-308f.up.railway.app',
+  port: parseInt(process.env.DB_PORT || '3306'),
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh',
   database: process.env.DB_NAME || 'railway',
@@ -12,11 +12,13 @@ export const db = mysql.createPool({
   queueLimit: 0,
   acquireTimeout: 30000,
   connectTimeout: 30000,
-  idleTimeout: 900000,
+  idleTimeout: 600000,
+  timeout: 60000,
   ssl: {
     rejectUnauthorized: false
   },
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
+  multipleStatements: false
 });
 
 // Test database connection
