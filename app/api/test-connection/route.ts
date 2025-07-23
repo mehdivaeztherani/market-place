@@ -6,10 +6,10 @@ export async function GET() {
     {
       name: "Railway Direct Host",
       config: {
-        host: 'mysql-production-308f.up.railway.app',
-        port: 3306,
+        host: 'turntable.proxy.rlwy.net',
+        port: 42664,
         user: 'root',
-        password: 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh',
+        password: 'OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm',
         database: 'railway',
         connectTimeout: 30000,
         ssl: { rejectUnauthorized: false }
@@ -18,10 +18,10 @@ export async function GET() {
     {
       name: "Railway Proxy Host",
       config: {
-        host: 'metro.proxy.rlwy.net',
-        port: 46806,
+        host: 'turntable.proxy.rlwy.net',
+        port: 42664,
         user: 'root',
-        password: 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh',
+        password: 'OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm',
         database: 'railway',
         connectTimeout: 30000,
         ssl: { rejectUnauthorized: false }
@@ -30,10 +30,10 @@ export async function GET() {
     {
       name: "Railway Direct Host (No SSL)",
       config: {
-        host: 'mysql-production-308f.up.railway.app',
-        port: 3306,
+        host: 'turntable.proxy.rlwy.net',
+        port: 42664,
         user: 'root',
-        password: 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh',
+        password: 'OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm',
         database: 'railway',
         connectTimeout: 30000
       }

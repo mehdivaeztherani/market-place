@@ -2,10 +2,10 @@ import mysql from 'mysql2/promise';
 
 // Create connection pool for better performance
 export const db = mysql.createPool({
-  host: process.env.DB_HOST || 'mysql-production-308f.up.railway.app',
-  port: parseInt(process.env.DB_PORT || '3306'),
+  host: process.env.DB_HOST || 'turntable.proxy.rlwy.net',
+  port: parseInt(process.env.DB_PORT || '42664'),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh',
+  password: process.env.DB_PASSWORD || 'OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm',
   database: process.env.DB_NAME || 'railway',
   waitForConnections: true,
   connectionLimit: 10,
@@ -25,8 +25,8 @@ export const db = mysql.createPool({
 export async function testConnection() {
   try {
     console.log('🔄 Attempting to connect to Railway MySQL...');
-    console.log(`📍 Host: ${process.env.DB_HOST || 'metro.proxy.rlwy.net'}`);
-    console.log(`🔌 Port: ${process.env.DB_PORT || '46806'}`);
+    console.log(`📍 Host: ${process.env.DB_HOST || 'turntable.proxy.rlwy.net'}`);
+    console.log(`🔌 Port: ${process.env.DB_PORT || '42664'}`);
     console.log(`🗄️  Database: ${process.env.DB_NAME || 'railway'}`);
     
     const connection = await db.getConnection();
@@ -37,8 +37,8 @@ export async function testConnection() {
     console.error('❌ Railway MySQL Database connection failed:');
     console.error('Error details:', error);
     console.error('Connection config:', {
-      host: process.env.DB_HOST || 'metro.proxy.rlwy.net',
-      port: process.env.DB_PORT || '46806',
+      host: process.env.DB_HOST || 'turntable.proxy.rlwy.net',
+      port: process.env.DB_PORT || '42664',
       database: process.env.DB_NAME || 'railway',
       user: process.env.DB_USER || 'root'
     });

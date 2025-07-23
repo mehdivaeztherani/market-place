@@ -5,15 +5,15 @@
 Your project is now configured to use Railway.com's MySQL cloud database instead of localhost.
 
 ### Connection Details
-- **Host**: `metro.proxy.rlwy.net`
-- **Port**: `46806`
+- **Host**: `turntable.proxy.rlwy.net`
+- **Port**: `42664`
 - **Database**: `railway`
 - **Username**: `root`
-- **Password**: `fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh`
+- **Password**: `OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm`
 
 ### Connection URL
 ```
-mysql://root:fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh@metro.proxy.rlwy.net:46806/railway
+mysql://root:OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm@turntable.proxy.rlwy.net:42664/railway
 ```
 
 ## Files Updated
@@ -85,10 +85,10 @@ Or visit: `http://localhost:3000/api/test-db` in your browser.
 
 Make sure your `.env.local` file contains:
 ```env
-DB_HOST=metro.proxy.rlwy.net
-DB_PORT=46806
+DB_HOST=turntable.proxy.rlwy.net
+DB_PORT=42664
 DB_USER=root
-DB_PASSWORD=fNAIBOTGTwJXyqnqNcGtHuqoQRTIphrh
+DB_PASSWORD=OlWIFZHFiPpWIXCfaWdBLhILYxoqgecm
 DB_NAME=railway
 ```
 
@@ -103,7 +103,7 @@ DB_NAME=railway
 If you encounter connection issues:
 
 1. **SSL/TLS Issues**: The configuration includes `ssl: { rejectUnauthorized: false }` for Railway compatibility
-2. **Port Issues**: Make sure port `46806` is accessible
+2. **Port Issues**: Make sure port `42664` is accessible
 3. **Network Issues**: Railway's proxy domain should be accessible from your location
 4. **Database Permissions**: The `root` user should have full access to the `railway` database
 
