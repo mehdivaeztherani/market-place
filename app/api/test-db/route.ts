@@ -43,8 +43,9 @@ export async function GET() {
       return NextResponse.json({
         connected: true,
         message: "Database connection successful!",
-        host: process.env.DB_HOST,
-        database: process.env.DB_NAME,
+        host: process.env.DB_HOST || 'turntable.proxy.rlwy.net',
+        database: process.env.DB_NAME || 'railway',
+        port: process.env.DB_PORT || '42664',
         data: {
           agents: agentCount,
           posts: postCount
@@ -64,10 +65,10 @@ export async function GET() {
       details: error instanceof Error ? error.message : 'Unknown error',
       connected: false,
       config: {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER
+        host: process.env.DB_HOST || 'turntable.proxy.rlwy.net',
+        port: process.env.DB_PORT || '42664',
+        database: process.env.DB_NAME || 'railway',
+        user: process.env.DB_USER || 'root'
       }
     }, { status: 500 });
   }

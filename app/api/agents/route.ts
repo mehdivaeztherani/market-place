@@ -8,14 +8,10 @@ export async function GET() {
     connection = await db.getConnection();
     console.log('API: Database connection established');
 
-    // First, let's check what columns exist in the agents table
-    const [columns] = await connection.query(
-      `SHOW COLUMNS FROM agents`
-    );
+    // Initialize database (create tables if they don't exist)
+    await initializeDatabase();
 
-    console.log("Available columns:", columns);
-
-    // Use a safer query that handles missing columns - REMOVED profile_image
+    // Now fetch agents
     const [agents] = await connection.query(
       `SELECT 
         id, 
@@ -32,7 +28,7 @@ export async function GET() {
 
     console.log(`API: Found ${(agents as any[]).length} agents`);
 
-    // Format agents data properly - NO profile_image
+    // Format agents data properly
     const formattedAgents = (agents as any[]).map(agent => ({
       id: agent.id,
       name: agent.name,
@@ -41,7 +37,7 @@ export async function GET() {
       instagram: agent.instagram,
       twitter: agent.twitter,
       linkedin: agent.linkedin,
-      profileImage: agent.profile_image // now from DB
+      profileImage: agent.profile_image
     }));
 
     console.log('API: Returning agents data:', formattedAgents);
@@ -63,6 +59,9 @@ export async function GET() {
     }
   }
 }
+
+// Import the initializeDatabase function
+import { initializeDatabase } from "@/lib/db";
 
 export async function POST(request: Request) {
   let connection;
